@@ -10,7 +10,7 @@ import lombok.Data;
  * @since : 2019-01-18 14:10
  */
 @Data
-public class BasePageReq {
+public class WorkflowPageReq {
 
     /**
      * 起始页
@@ -34,4 +34,13 @@ public class BasePageReq {
     @ApiModelProperty(name = "orderBy", value = "排序字段")
     private String orderBy;
 
+    /**
+     * 工作流用户编号
+     */
+    @ApiModelProperty(name = "workflowUserId", value = "工作流用户编号")
+    private String workflowUserId;
+
+    public Integer pageStart(){
+        return pageNum * pageSize;
+    }
 }

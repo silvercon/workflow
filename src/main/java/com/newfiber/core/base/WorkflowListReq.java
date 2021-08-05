@@ -8,7 +8,7 @@ import lombok.Data;
  * @since : 2019-01-18 14:10
  */
 @Data
-public class BaseListReq {
+public class WorkflowListReq {
 
     /**
      * 排序字段

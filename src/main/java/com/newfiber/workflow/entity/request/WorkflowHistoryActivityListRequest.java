@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class WorkflowModelNextTaskRequest {
+public class WorkflowHistoryActivityListRequest {
 
     /**
      * 工作流编号
@@ -15,10 +15,10 @@ public class WorkflowModelNextTaskRequest {
     private String workflowKey;
 
     /**
-     * 当前任务
+     * 业务编号
      */
     @NotNull
-    @ApiModelProperty(name = "currentTask", value = "当前任务", required = true)
-    private String currentTask;
+    @ApiModelProperty(name = "businessKey", value = "业务编号", required = true)
+    private String businessKey;
 
 }

@@ -7,13 +7,13 @@ import com.newfiber.workflow.utils.PageWrapper;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
-public interface ActivitiService {
+public interface ActivitiModelService {
 
     void delete(String deploymentId);
 
     void upload(MultipartFile multipartFile);
 
-    List<WorkflowModelNextTaskResponse> nextTasks(String workflowModelKey, String currentTask);
+    List<WorkflowModelNextTaskResponse> nextTasks(String workflowKey, String currentTask);
 
     PageWrapper<WorkflowModel> pageWorkflowModel(WorkflowModelPageRequest request);
 

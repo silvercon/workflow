@@ -1,6 +1,6 @@
 package com.newfiber.workflow.utils;
 
-import com.newfiber.core.base.BasePageReq;
+import com.newfiber.core.base.WorkflowPageReq;
 import com.newfiber.core.result.PageInfo;
 import java.util.List;
 
@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class PageWrapper<T> extends PageInfo<T> {
 
-    public PageWrapper(List<T> list, BasePageReq pageReq) {
+    public PageWrapper(List<T> list, WorkflowPageReq pageReq) {
         this.list = list;
         this.total = list.size();
 

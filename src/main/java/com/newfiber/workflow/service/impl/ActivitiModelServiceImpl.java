@@ -4,7 +4,7 @@ import com.newfiber.core.exception.BizException;
 import com.newfiber.workflow.entity.WorkflowModel;
 import com.newfiber.workflow.entity.request.WorkflowModelPageRequest;
 import com.newfiber.workflow.entity.response.WorkflowModelNextTaskResponse;
-import com.newfiber.workflow.service.ActivitiService;
+import com.newfiber.workflow.service.ActivitiModelService;
 import com.newfiber.workflow.utils.PageWrapper;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
-public class ActivitiServiceImpl implements ActivitiService {
+public class ActivitiModelServiceImpl implements ActivitiModelService {
 
     @Resource
     private RepositoryService repositoryService;
@@ -48,10 +48,10 @@ public class ActivitiServiceImpl implements ActivitiService {
     }
 
     @Override
-    public List<WorkflowModelNextTaskResponse> nextTasks(String workflowModelKey, String currentTask) {
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey(workflowModelKey).singleResult();
+    public List<WorkflowModelNextTaskResponse> nextTasks(String workflowKey, String currentTask) {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey(workflowKey).singleResult();
         if(null == processDefinition){
-            throw new BizException("工作流【{}】不存在", workflowModelKey);
+            throw new BizException(String.format("工作流【%s】不存在", workflowKey));
         }
 
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
@@ -60,7 +60,7 @@ public class ActivitiServiceImpl implements ActivitiService {
         List<FlowElement> currentActivityFlowElementList = flowElementList.stream().filter(t -> t instanceof Task).filter(
                 t -> t.getId().equals(currentTask)).collect(Collectors.toList());
         if(CollectionUtils.isEmpty(currentActivityFlowElementList)){
-            throw new BizException("任务节点【{}】不存在", currentTask);
+            throw new BizException(String.format("任务节点【%s】不存在", currentTask));
         }
 
         Task currentTaskFlowElement = (Task) currentActivityFlowElementList.get(0);

@@ -6,8 +6,8 @@ public interface IWorkflowCallback {
 
     IWorkflowDefinition getWorkflowDefinition();
 
-    <T> void refreshWorkflowInstanceId(T businessKey, String workflowInstanceId);
+    void refreshWorkflowInstanceId(Object businessKey, String workflowInstanceId);
 
-    <T> void refreshStatus(T businessKey, String status);
+    void refreshStatus(Object businessKey, String status);
 
 }
