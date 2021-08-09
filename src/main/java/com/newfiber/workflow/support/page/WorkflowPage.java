@@ -11,7 +11,7 @@ public class WorkflowPage {
     /**
      * 用户编号
      */
-    private Object userId;
+    private String userId;
 
     /**
      * 任务主键/状态
@@ -21,9 +21,9 @@ public class WorkflowPage {
     /**
      * 回调接口
      */
-    private IWorkflowCallback workflowCallback;
+    private IWorkflowCallback<?> workflowCallback;
 
-    public static WorkflowPage build(Object userId, String taskKey, IWorkflowCallback workflowCallback){
-        return new WorkflowPage(userId, taskKey, workflowCallback);
+    public static WorkflowPage build(Object userId, String taskKey, IWorkflowCallback<?> workflowCallback){
+        return new WorkflowPage(userId.toString(), taskKey, workflowCallback);
     }
 }

@@ -21,4 +21,16 @@ public class WorkflowHistoryActivityListRequest {
     @ApiModelProperty(name = "businessKey", value = "业务编号", required = true)
     private String businessKey;
 
+    /**
+     * 状态
+     */
+    @ApiModelProperty(name = "status", value = "状态")
+    private String status;
+
+    /**
+     * 工作流用户编号
+     */
+    @ApiModelProperty(name = "workflowUserId", value = "工作流用户编号")
+    private String workflowUserId;
+
 }

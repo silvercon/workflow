@@ -34,7 +34,8 @@ public class WorkflowProcessController {
     @ApiOperation(value = "列表查询历史活动记录")
     @PostMapping(value = "list-history-activity")
     public Result<List<WorkflowHistoricActivity>> listHistoryActivity(@Valid @RequestBody WorkflowHistoryActivityListRequest request) {
-        return new Result<>(ResultCode.SUCCESS, activitiProcessService.listHistoricActivity(request.getWorkflowKey(), request.getBusinessKey()));
+        return new Result<>(ResultCode.SUCCESS, activitiProcessService.listHistoricActivity(
+                request.getWorkflowKey(), request.getBusinessKey(), request.getWorkflowUserId(), request.getStatus()));
     }
 
 }

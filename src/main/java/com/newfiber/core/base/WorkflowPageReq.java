@@ -6,8 +6,8 @@ import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * @author : xieyj
- * @since : 2019-01-18 14:10
+ * 工作流任务分页查询请求，业务请求继承该类
+ * @see com.newfiber.workflow.service.ActivitiProcessService#pageTodoBusinessKey(String, String, Object, Object, WorkflowPageReq)
  */
 @Data
 public class WorkflowPageReq {
@@ -33,6 +33,12 @@ public class WorkflowPageReq {
      */
     @ApiModelProperty(name = "orderBy", value = "排序字段")
     private String orderBy;
+
+    /**
+     * 状态
+     */
+    @ApiModelProperty(name = "status", value = "状态")
+    private String status;
 
     /**
      * 工作流用户编号

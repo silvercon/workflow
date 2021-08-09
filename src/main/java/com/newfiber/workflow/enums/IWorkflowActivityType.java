@@ -1,5 +1,8 @@
 package com.newfiber.workflow.enums;
 
+/**
+ * 工作流活动类型
+ */
 public interface IWorkflowActivityType {
 
     enum EventActivity implements IWorkflowActivityType {
