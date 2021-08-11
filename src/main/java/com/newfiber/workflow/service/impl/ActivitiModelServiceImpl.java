@@ -20,6 +20,7 @@ import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.Task;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,6 +45,7 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
             repositoryService.createDeployment().addInputStream(filename, is).deploy();
         } catch (Exception e) {
             log.error("【工作流模型】上传工作流模型文件失败：{}--{}", e.getMessage(), e.getStackTrace());
+            throw new BizException(e.getMessage());
         }
     }
 
@@ -77,7 +79,13 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
         List<WorkflowModelNextTaskResponse> responses = new ArrayList<>();
         for(FlowElement flowElement : currentTaskTargetFlowElement){
             if(flowElement instanceof Task){
-                WorkflowModelNextTaskResponse.append(responses, (Task) flowElement);
+                String conditionExpression = "";
+                List<SequenceFlow> sequenceFlowList = ((Task) flowElement).getIncomingFlows().stream().filter(
+                        t -> t.getSourceRef().equals(currentTask) && t.getTargetRef().equals(flowElement.getId())).collect(Collectors.toList());
+                if(!CollectionUtils.isEmpty(sequenceFlowList)){
+                    conditionExpression = sequenceFlowList.get(0).getConditionExpression();
+                }
+                WorkflowModelNextTaskResponse.append(responses, (Task) flowElement, conditionExpression);
             }else if(flowElement instanceof ExclusiveGateway){
                 List<FlowElement> nextTasks = flowElementList.stream().filter(
                         t -> t instanceof SequenceFlow).filter(t -> ((SequenceFlow) t).getSourceRef().equals(flowElement.getId())).collect(Collectors.toList());
@@ -93,22 +101,12 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
     public PageWrapper<WorkflowModel> pageWorkflowModel(WorkflowModelPageRequest request) {
         List<ProcessDefinition> processDefinitionList = repositoryService.createProcessDefinitionQuery().list();
 
-        PageWrapper processDefinitionPageWrapper = new PageWrapper<>(processDefinitionList, request);
+        PageWrapper<WorkflowModel> processDefinitionPageWrapper = new PageWrapper(processDefinitionList, request);
 
         List<WorkflowModel> workflowModelList = new ArrayList<>();
         for(Object object : processDefinitionPageWrapper.getPage(request.getPageNum())){
-            ProcessDefinition processDefinition = (ProcessDefinition) object;
             WorkflowModel workflowModel = new WorkflowModel();
-            workflowModel.setId(processDefinition.getId());
-            workflowModel.setDeploymentId(processDefinition.getDeploymentId());
-            workflowModel.setVersion(processDefinition.getVersion());
-            workflowModel.setCategory(processDefinition.getCategory());
-
-            workflowModel.setKey(processDefinition.getKey());
-            workflowModel.setName(processDefinition.getName());
-            workflowModel.setResourceName(processDefinition.getResourceName());
-            workflowModel.setDiagramResourceName(processDefinition.getDiagramResourceName());
-            workflowModel.setDescription(processDefinition.getDescription());
+            BeanUtils.copyProperties(object, workflowModel);
             workflowModelList.add(workflowModel);
         }
 

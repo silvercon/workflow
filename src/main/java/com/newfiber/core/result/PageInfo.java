@@ -1,6 +1,7 @@
 package com.newfiber.core.result;
 
 import com.github.pagehelper.Page;
+import com.newfiber.core.base.WorkflowPageReq;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.util.Collection;
@@ -77,6 +78,17 @@ public class PageInfo<T> implements Serializable {
             this.size = list.size();
             this.total = (long) list.size();
         }
+    }
+
+    public PageInfo(WorkflowPageReq workflowPageReq, List<T> list, long total){
+        this.pageNum = workflowPageReq.getPageNum();
+        this.pageSize = workflowPageReq.getPageSize();
+        this.list = list;
+        this.size = list.size();
+        this.total = total;
+
+        this.pages = list.size() % workflowPageReq.getPageSize() == 0 ?
+                list.size() / workflowPageReq.getPageSize() : list.size() / workflowPageReq.getPageSize() + 1;
     }
 
     @Override

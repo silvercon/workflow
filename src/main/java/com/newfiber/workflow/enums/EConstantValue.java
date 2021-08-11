@@ -8,6 +8,8 @@ public enum EConstantValue {
     /**
      */
     ApproveResultField("审核结果字段", "approveResult"),
+    ApproveUserField("审核用户字段", "approveUserId"),
+    ApproveRoleField("审核角色字段", "approveRoleId"),
 
     EndEvent("结束事件", "end"),
 

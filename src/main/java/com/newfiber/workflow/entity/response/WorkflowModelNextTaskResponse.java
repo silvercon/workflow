@@ -37,8 +37,8 @@ public class WorkflowModelNextTaskResponse {
         this.nextTaskName = nextTaskName;
     }
 
-    public static void append(List<WorkflowModelNextTaskResponse> responses, Task task){
-        responses.add(new WorkflowModelNextTaskResponse(task.getId(), task.getName()));
+    public static void append(List<WorkflowModelNextTaskResponse> responses, Task task, String conditionExpression){
+        responses.add(new WorkflowModelNextTaskResponse(task.getId(), task.getName(), conditionExpression));
     }
 
     public static void append(List<WorkflowModelNextTaskResponse> responses, List<FlowElement> flowElementList){

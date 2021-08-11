@@ -1,9 +1,11 @@
 package com.newfiber.workflow.service;
 
 import com.newfiber.core.base.WorkflowPageReq;
+import com.newfiber.core.base.WorkflowStartReq;
 import com.newfiber.core.base.WorkflowSubmitReq;
 import com.newfiber.core.result.PageInfo;
 import com.newfiber.workflow.entity.WorkflowHistoricActivity;
+import com.newfiber.workflow.entity.WorkflowUser;
 import com.newfiber.workflow.support.IWorkflowCallback;
 import java.util.List;
 import java.util.Map;
@@ -13,42 +15,59 @@ import java.util.Map;
  */
 public interface ActivitiProcessService {
 
-    /**
-     * 启动工作流
-     * @param businessKey 业务编号
-     * @param workflowCallback 回调接口
-     * @return 工作流实体编号
-     */
-    String startWorkflow(Object businessKey, IWorkflowCallback<?> workflowCallback);
+    // ************************* 启动工作流 ************************* //
 
     /**
      * 启动工作流
-     * @param businessKey 业务编号
      * @param workflowCallback 回调接口
+     * @param businessKey 业务编号
+     * @return 工作流实体编号
+     */
+    String startWorkflow(IWorkflowCallback<?> workflowCallback, Object businessKey);
+
+    /**
+     * 启动工作流
+     * @param workflowCallback 回调接口
+     * @param businessKey 业务编号
+     * @param startReq 启动参数
+     * @return 工作流实体编号
+     */
+    String startWorkflow(IWorkflowCallback<?> workflowCallback, Object businessKey, WorkflowStartReq startReq);
+
+    /**
+     * 启动工作流
+     * @param workflowCallback 回调接口
+     * @param businessKey 业务编号
      * @param variables 工作流变量
      * @return 工作流实体编号
      */
-    String startWorkflow(Object businessKey, IWorkflowCallback<?> workflowCallback, Map<String, Object> variables);
+    String startWorkflow(IWorkflowCallback<?> workflowCallback, Object businessKey, Map<String, Object> variables);
+
+    // ************************* 提交工作流 ************************* //
 
     /**
      * 提交工作流
+     * @param callback 回调接口
      * @param businessKey 业务编号
      * @param submitUser 提交人
      * @param approveResult 提交结果
-     * @param callback 回调接口
-     * @return TODO
+     * @param nextTaskApproveUserId 下一步审核人
+     * @param nextTaskApproveRoleId 下一步审核角色
+     * @return 业务编号
      */
-    String submitWorkflow(Object businessKey, Object submitUser, String approveResult, IWorkflowCallback<?> callback);
+    String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, Object submitUser, String approveResult,
+            String nextTaskApproveUserId, String nextTaskApproveRoleId);
 
     /**
      * 提交工作流
-     * @param businessKey 业务编号
-     * @param submitUser 提交人
-     * @param submitReq 提交结果
      * @param callback 回调接口
-     * @return TODO
+     * @param businessKey 业务编号
+     * @param submitReq 提交结果
+     * @return 业务编号
      */
-    String submitWorkflow(Object businessKey, Object submitUser, WorkflowSubmitReq submitReq, IWorkflowCallback<?> callback);
+    String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, WorkflowSubmitReq submitReq);
+
+    // ************************* 根据用户列表查询工作流 ************************* //
 
     /**
      * 根据用户查询代办的业务实体编号
@@ -69,13 +88,42 @@ public interface ActivitiProcessService {
     List<String> listTaskDoneBusinessKeyByUser(String workflowKey, String taskKey, Object userId);
 
     /**
-     * 根据用户查询涉及（待办/已完成）到的业务实体编号
+     * 查询任务待办/已完成的业务实体编号
      * @param workflowKey 工作流编号
      * @param taskKey 任务编号
      * @param userId 用户编号
      * @return 代办的业务实体编号
      */
     List<String> listInvolvedBusinessKeyByUser(String workflowKey, String taskKey, Object userId);
+
+    /**
+     * 根据用户查询代办的业务实体编号
+     * @param callback 回调接口
+     * @param taskKey 任务编号
+     * @param userId 用户编号
+     * @return 代办的业务实体编号
+     */
+    List<String> listTodoBusinessKeyByUser(IWorkflowCallback<?> callback, String taskKey, Object userId);
+
+    /**
+     * 查询任务已完成的业务实体编号
+     * @param callback 回调接口
+     * @param taskKey 任务编号
+     * @param userId 用户编号
+     * @return 代办的业务实体编号
+     */
+    List<String> listTaskDoneBusinessKeyByUser(IWorkflowCallback<?> callback, String taskKey, Object userId);
+
+    /**
+     * 查询任务待办/已完成的业务实体编号
+     * @param callback 回调接口
+     * @param taskKey 任务编号
+     * @param userId 用户编号
+     * @return 代办的业务实体编号
+     */
+    List<String> listInvolvedBusinessKeyByUser(IWorkflowCallback<?> callback, String taskKey, Object userId);
+
+    // ************************* 根据用户/用户组列表查询工作流 ************************* //
 
     /**
      * 查询代办的业务实体编号
@@ -86,6 +134,16 @@ public interface ActivitiProcessService {
      * @return 代办的业务实体编号
      */
     List<String> listTodoBusinessKey(String workflowKey, String taskKey, Object groupId, Object userId);
+
+    /**
+     * 列表查询待办业务的可执行人
+     * @param workflowKey 工作流编号
+     * @param businessKey 业务编号
+     * @return 工作流用户
+     */
+    List<WorkflowUser> listTodoBusinessExecutor(String workflowKey, Object businessKey);
+
+    // ************************* 分页查询工作流 ************************* //
 
     /**
      * 根据用户查询代办的业务实体编号
@@ -107,6 +165,8 @@ public interface ActivitiProcessService {
      * @return 代办的业务实体编号
      */
     PageInfo<String> pageTodoBusinessKey(String workflowKey, String taskKey, Object groupId, Object userId, WorkflowPageReq workflowPageReq);
+
+    // ************************* 列表查询工作流历史记录 ************************* //
 
     /**
      * 列表查询历史活动记录

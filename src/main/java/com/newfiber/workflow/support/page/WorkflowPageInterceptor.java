@@ -57,18 +57,16 @@ public class WorkflowPageInterceptor implements Interceptor{
 
         resourceCheck();
 
-        List<String> businessKeyList = activitiProcessService.listTodoBusinessKeyByUser(
-                workflowPage.getWorkflowCallback().getWorkflowDefinition().getWorkflowKey(),
-                workflowPage.getTaskKey(), workflowPage.getUserId());
-        List<String> taskDoneBusinessKeyList = activitiProcessService.listTaskDoneBusinessKeyByUser(workflowPage.getWorkflowCallback().getWorkflowDefinition().getWorkflowKey(),
-                workflowPage.getTaskKey(), workflowPage.getUserId());
-        businessKeyList.addAll(taskDoneBusinessKeyList);
+        // 待办/已完成的业务编号
+        List<String> businessKeyList = activitiProcessService.listInvolvedBusinessKeyByUser(
+                workflowPage.getWorkflowCallback(), workflowPage.getTaskKey(), workflowPage.getUserId());
 
         Object[] args = invocation.getArgs();
         MappedStatement mappedStatement = (MappedStatement) args[0];
         Object parameterObject = args[1];
         BoundSql boundSql = mappedStatement.getBoundSql(parameterObject);
 
+        // 拼接新SQL
         String executeSql = boundSql.getSql();
         executeSql = appendWhereIdCondition(executeSql, businessKeyList, workflowPage.getWorkflowCallback());
 

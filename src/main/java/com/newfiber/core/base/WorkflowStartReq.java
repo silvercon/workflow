@@ -2,28 +2,19 @@ package com.newfiber.core.base;
 
 import com.newfiber.workflow.support.IWorkflowCallback;
 import io.swagger.annotations.ApiModelProperty;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * 工作流任务提交请求，业务请求继承该类
- * @see com.newfiber.workflow.service.ActivitiProcessService#submitWorkflow(IWorkflowCallback, Object, WorkflowSubmitReq)
+ * 工作流任务开始请求，业务请求继承该类
+ * @see com.newfiber.workflow.service.ActivitiProcessService#startWorkflow(IWorkflowCallback, Object, WorkflowStartReq)
  */
 @Data
-public class WorkflowSubmitReq {
-
-    /**
-     * 审核结果，流程图变量${approveResult}
-     */
-    @NotNull
-    @ApiModelProperty(name = "approveResult", value = "审核结果，流程图变量${approveResult}", required = true)
-    String approveResult;
+public class WorkflowStartReq {
 
     /**
      * 提交人编号
      */
-    @NotNull
-    @ApiModelProperty(name = "submitUserId", value = "提交人编号", required = true)
+    @ApiModelProperty(name = "submitUserId", value = "提交人编号", hidden = true)
     private String submitUserId;
 
     /**
