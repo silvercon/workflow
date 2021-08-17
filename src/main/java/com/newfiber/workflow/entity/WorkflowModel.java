@@ -42,6 +42,12 @@ public class WorkflowModel {
     private String name;
 
     /**
+     * 是否部署
+     */
+    @ApiModelProperty(name = "deploymentFlag", value = "是否部署")
+    private Boolean deploymentFlag = false;
+
+    /**
      * 资源名称
      */
     @ApiModelProperty(name = "resourceName", value = "资源名称")
@@ -59,4 +65,27 @@ public class WorkflowModel {
     @ApiModelProperty(name = "description", value = "描述")
     private String description;
 
+    /**
+     * 编辑器资源编号
+     */
+    @ApiModelProperty(name = "editorSourceValueId", value = "编辑器资源编号")
+    private String editorSourceValueId;
+
+    /**
+     * 额外编辑器资源
+     */
+    @ApiModelProperty(name = "editorSourceExtValueId", value = "额外编辑器资源")
+    private String editorSourceExtValueId;
+
+    /**
+     * 编辑器资源
+     */
+    @ApiModelProperty(name = "editorSource", value = "编辑器资源")
+    private String editorSource;
+
+    /**
+     * 额外编辑器资源
+     */
+    @ApiModelProperty(name = "editorSourceExt", value = "额外编辑器资源")
+    private String editorSourceExt;
 }

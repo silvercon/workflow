@@ -4,6 +4,8 @@ import com.newfiber.core.result.PageInfo;
 import com.newfiber.core.result.Result;
 import com.newfiber.core.result.ResultCode;
 import com.newfiber.workflow.entity.WorkflowModel;
+import com.newfiber.workflow.entity.request.WorkflowModeCreateRequest;
+import com.newfiber.workflow.entity.request.WorkflowModeModifyRequest;
 import com.newfiber.workflow.entity.request.WorkflowModelNextTaskRequest;
 import com.newfiber.workflow.entity.request.WorkflowModelPageRequest;
 import com.newfiber.workflow.entity.response.WorkflowModelNextTaskResponse;
@@ -29,10 +31,31 @@ public class WorkflowModelController {
     @Resource
     private ActivitiModelService activitiModelService;
 
+    @ApiOperation(value = "新增工作流模型")
+    @PostMapping(value = "/create")
+    public Result<Object> create(@RequestBody @Valid WorkflowModeCreateRequest request) {
+        activitiModelService.create(request);
+        return new Result<>(ResultCode.SUCCESS);
+    }
+
+    @ApiOperation(value = "修改工作流模型")
+    @PostMapping(value = "/modify")
+    public Result<Object> modify(@RequestBody @Valid WorkflowModeModifyRequest request) {
+        activitiModelService.modify(request);
+        return new Result<>(ResultCode.SUCCESS);
+    }
+
+    @ApiOperation(value = "部署工作流模型")
+    @PostMapping(value = "/deploy/{modelId}")
+    public Result<Object> deploy(@PathVariable String modelId) {
+        activitiModelService.deploy(modelId);
+        return new Result<>(ResultCode.SUCCESS);
+    }
+
     @ApiOperation(value = "删除工作流模型")
-    @PostMapping(value = "/delete/{deploymentId}")
-    public Result<Object> delete(@PathVariable String deploymentId) {
-        activitiModelService.delete(deploymentId);
+    @PostMapping(value = "/delete/{modelId}")
+    public Result<Object> delete(@PathVariable String modelId) {
+        activitiModelService.delete(modelId);
         return new Result<>(ResultCode.SUCCESS);
     }
 
@@ -48,6 +71,12 @@ public class WorkflowModelController {
     public Result<List<WorkflowModelNextTaskResponse>> nextGatewayTasks(@RequestBody @Valid WorkflowModelNextTaskRequest request) {
         return new Result<>(ResultCode.SUCCESS, activitiModelService
                 .nextTasks(request.getWorkflowKey(), request.getCurrentTask()));
+    }
+
+    @ApiOperation(value = "详细查询工作流模型")
+    @PostMapping(value = "/detail/{modelId}")
+    public Result<WorkflowModel> detail(@PathVariable String modelId) {
+        return new Result<>(ResultCode.SUCCESS, activitiModelService.detail(modelId));
     }
 
     @ApiOperation(value = "分页查询工作流模型")

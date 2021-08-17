@@ -1,6 +1,8 @@
 package com.newfiber.workflow.service;
 
 import com.newfiber.workflow.entity.WorkflowModel;
+import com.newfiber.workflow.entity.request.WorkflowModeCreateRequest;
+import com.newfiber.workflow.entity.request.WorkflowModeModifyRequest;
 import com.newfiber.workflow.entity.request.WorkflowModelPageRequest;
 import com.newfiber.workflow.entity.response.WorkflowModelNextTaskResponse;
 import com.newfiber.workflow.utils.PageWrapper;
@@ -13,10 +15,28 @@ import org.springframework.web.multipart.MultipartFile;
 public interface ActivitiModelService {
 
     /**
-     * 删除
-     * @param deploymentId 工作流部署编号
+     * 新增
+     * @param request 新增参数
      */
-    void delete(String deploymentId);
+    void create(WorkflowModeCreateRequest request);
+
+    /**
+     * 修改
+     * @param request 修改参数
+     */
+    void modify(WorkflowModeModifyRequest request);
+
+    /**
+     * 部署
+     * @param modelId 模型编号
+     */
+    void deploy(String modelId);
+
+    /**
+     * 删除
+     * @param modelId 模型编号
+     */
+    void delete(String modelId);
 
     /**
      * 上传模型文件
@@ -31,6 +51,13 @@ public interface ActivitiModelService {
      * @return
      */
     List<WorkflowModelNextTaskResponse> nextTasks(String workflowKey, String currentTask);
+
+    /**
+     * 详细查
+     * @param modelId 模型编号
+     * @return 模型
+     */
+    WorkflowModel detail(String modelId);
 
     /**
      * 分页查询工作流模型

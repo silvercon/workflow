@@ -14,7 +14,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Slf4j
 @RestController
 @EnableSwagger2
-@SpringBootApplication(scanBasePackages = {"com.newfiber.workflow", "com.newfiber.core.exception"},
+@SpringBootApplication(scanBasePackages = {"com.newfiber.workflow", "com.newfiber.core.exception", "com.newfiber.config"},
         exclude={SecurityAutoConfiguration.class})
 public class WorkflowApplication {
 
