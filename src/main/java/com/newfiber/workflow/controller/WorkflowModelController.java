@@ -5,7 +5,6 @@ import com.newfiber.core.result.Result;
 import com.newfiber.core.result.ResultCode;
 import com.newfiber.workflow.entity.WorkflowModel;
 import com.newfiber.workflow.entity.request.WorkflowModeCreateRequest;
-import com.newfiber.workflow.entity.request.WorkflowModeModifyRequest;
 import com.newfiber.workflow.entity.request.WorkflowModelNextTaskRequest;
 import com.newfiber.workflow.entity.request.WorkflowModelPageRequest;
 import com.newfiber.workflow.entity.response.WorkflowModelNextTaskResponse;
@@ -17,31 +16,35 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@Api(value = "WF01-工作流模型管理", tags = "WF01-工作流模型管理")
+@Api(value = "WF02-工作流模型管理", tags = "WF02-工作流模型管理")
 @RequestMapping("/workflow-model")
 public class WorkflowModelController {
 
     @Resource
     private ActivitiModelService activitiModelService;
 
-    @ApiOperation(value = "新增工作流模型")
+    @ApiOperation(value = "创建工作流模型")
     @PostMapping(value = "/create")
     public Result<Object> create(@RequestBody @Valid WorkflowModeCreateRequest request) {
-        activitiModelService.create(request);
-        return new Result<>(ResultCode.SUCCESS);
+        return new Result<>(ResultCode.SUCCESS, activitiModelService.create(request));
     }
 
-    @ApiOperation(value = "修改工作流模型")
-    @PostMapping(value = "/modify")
-    public Result<Object> modify(@RequestBody @Valid WorkflowModeModifyRequest request) {
-        activitiModelService.modify(request);
+    @ResponseBody
+    @ApiOperation(value = "保存工作流模型")
+    @PutMapping(value = "/save")
+    public Object save(@RequestParam("modelId") String modelId, @RequestParam("key") String key, @RequestParam("name") String name,
+            @RequestParam("jsonXml") String jsonXml, @RequestParam("svgXml") String svgXml,
+            @RequestParam("description") String description) {
+        activitiModelService.save(modelId, key, name, jsonXml, svgXml, description);
         return new Result<>(ResultCode.SUCCESS);
     }
 
@@ -61,14 +64,14 @@ public class WorkflowModelController {
 
     @ApiOperation(value = "上传工作流文件")
     @PostMapping(value = "/upload")
-    public Result<Object> upload(@RequestParam MultipartFile multipartFile) {
-        activitiModelService.upload(multipartFile);
+    public Result<Object> upload(@RequestParam String workflowKey, @RequestParam MultipartFile multipartFile) {
+        activitiModelService.upload(workflowKey, multipartFile);
         return new Result<>(ResultCode.SUCCESS);
     }
 
-    @ApiOperation(value = "下一步网关任务信息")
-    @PostMapping(value = "/nextGatewayTasks")
-    public Result<List<WorkflowModelNextTaskResponse>> nextGatewayTasks(@RequestBody @Valid WorkflowModelNextTaskRequest request) {
+    @ApiOperation(value = "下一步任务信息")
+    @PostMapping(value = "/nextTasks")
+    public Result<List<WorkflowModelNextTaskResponse>> nextTasks(@RequestBody @Valid WorkflowModelNextTaskRequest request) {
         return new Result<>(ResultCode.SUCCESS, activitiModelService
                 .nextTasks(request.getWorkflowKey(), request.getCurrentTask()));
     }

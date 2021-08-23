@@ -57,7 +57,7 @@ Map
 <String, E${entityName}${enumName}> map = get${entityName}${enumName}ResultMap();
 E${entityName}${enumName} result = map.get(code);
 if (result == null) {
-throw new BizException(ECommonErrorCode.E500001.getCode(),
+throw new ActivitiException(ECommonErrorCode.E500001.getCode(),
 ECommonErrorCode.E500001.getValue(), "E${entityName}${enumName}=" + code);
 }
 

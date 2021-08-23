@@ -1,6 +1,5 @@
 package com.newfiber.workflow.support;
 
-import com.newfiber.workflow.enums.IWorkflowDefinition;
 import com.newfiber.workflow.utils.ReflectionKit;
 
 /**

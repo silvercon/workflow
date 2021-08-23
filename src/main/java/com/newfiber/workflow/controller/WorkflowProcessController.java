@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Api(value = "WF03-工作流流程管理", tags = "WF03-工作流流程管理")
+@Api(value = "WF04-工作流流程管理", tags = "WF04-工作流流程管理")
 @RequestMapping("/workflow-process")
 public class WorkflowProcessController {
 

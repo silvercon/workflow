@@ -1,4 +1,4 @@
-package com.newfiber.workflow.enums;
+package com.newfiber.workflow.support;
 
 /**
  * 工作流定义

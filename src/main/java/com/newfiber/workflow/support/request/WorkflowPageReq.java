@@ -1,12 +1,14 @@
-package com.newfiber.core.base;
+package com.newfiber.workflow.support.request;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
+ * 工作流任务分页查询请求，业务请求继承该类
+ * @see com.newfiber.workflow.service.ActivitiProcessService#pageTodoBusinessKey(String, String, Object, Object, WorkflowPageReq)
  */
 @Data
-public class WorkflowListReq {
+public class WorkflowPageReq extends BasePageReq{
 
     /**
      * 工作流实例编号

@@ -1,5 +1,6 @@
 package com.newfiber.workflow.entity;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -81,7 +82,7 @@ public class WorkflowModel {
      * 编辑器资源
      */
     @ApiModelProperty(name = "editorSource", value = "编辑器资源")
-    private String editorSource;
+    private ObjectNode editorSource;
 
     /**
      * 额外编辑器资源

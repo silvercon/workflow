@@ -1,7 +1,8 @@
-package com.newfiber.core.base;
+package com.newfiber.workflow.support.request;
 
 import com.newfiber.workflow.support.IWorkflowCallback;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -17,7 +18,7 @@ public class WorkflowSubmitReq {
      */
     @NotNull
     @ApiModelProperty(name = "approveResult", value = "审核结果，流程图变量${approveResult}", required = true)
-    String approveResult;
+    private String approveResult;
 
     /**
      * 提交人编号
@@ -31,6 +32,12 @@ public class WorkflowSubmitReq {
      */
     @ApiModelProperty(name = "nextTaskApproveUserId", value = "下一步任务审核人")
     private String nextTaskApproveUserId;
+
+    /**
+     * 下一步任务会签审核人（会签）
+     */
+    @ApiModelProperty(name = "nextTaskApproveUserIdList", value = "下一步任务会签审核人")
+    private List<String> nextTaskApproveUserIdList;
 
     /**
      * 下一步任务审核角色

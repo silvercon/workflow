@@ -1,17 +1,17 @@
 package com.newfiber.workflow.service.impl;
 
-import com.newfiber.core.base.WorkflowPageReq;
-import com.newfiber.core.base.WorkflowStartReq;
-import com.newfiber.core.base.WorkflowSubmitReq;
-import com.newfiber.core.exception.BizException;
 import com.newfiber.core.result.PageInfo;
 import com.newfiber.workflow.entity.WorkflowHistoricActivity;
 import com.newfiber.workflow.entity.WorkflowUser;
+import com.newfiber.workflow.enums.EBoolean;
 import com.newfiber.workflow.enums.EConstantValue;
 import com.newfiber.workflow.enums.IWorkflowActivityType.EventActivity;
 import com.newfiber.workflow.enums.IWorkflowActivityType.TaskActivity;
 import com.newfiber.workflow.service.ActivitiProcessService;
 import com.newfiber.workflow.support.IWorkflowCallback;
+import com.newfiber.workflow.support.request.WorkflowPageReq;
+import com.newfiber.workflow.support.request.WorkflowStartReq;
+import com.newfiber.workflow.support.request.WorkflowSubmitReq;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.RuntimeService;
@@ -60,17 +61,20 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
 
     @Override
     public String startWorkflow(IWorkflowCallback<?> callback, Object businessKey) {
-        return startWorkflow(callback, businessKey, new HashMap<>(1));
+        return startWorkflow(callback, businessKey, new HashMap<>());
     }
 
     @Override
     public String startWorkflow(IWorkflowCallback<?> workflowCallback, Object businessKey, WorkflowStartReq startReq) {
-        Map<String, Object> variables = new HashMap<>(3);
+        Map<String, Object> variables = new HashMap<>();
         if(null != startReq && StringUtils.isNotBlank(startReq.getNextTaskApproveUserId())){
-            variables.put(EConstantValue.ApproveUserField.getValue(), startReq.getNextTaskApproveUserId());
+            variables.put(EConstantValue.ApproveUserIdField.getValue(), startReq.getNextTaskApproveUserId());
         }
         if(null != startReq && StringUtils.isNotBlank(startReq.getNextTaskApproveRoleId())){
-            variables.put(EConstantValue.ApproveRoleField.getValue(), startReq.getNextTaskApproveRoleId());
+            variables.put(EConstantValue.ApproveRoleIdField.getValue(), startReq.getNextTaskApproveRoleId());
+        }
+        if(null != startReq && !CollectionUtils.isEmpty(startReq.getNextTaskApproveUserIdList())){
+            variables.put(EConstantValue.ApproveUserIdListField.getValue(), startReq.getNextTaskApproveUserIdList());
         }
         return startWorkflow(workflowCallback, businessKey, variables);
     }
@@ -79,14 +83,15 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
     @Transactional(rollbackFor = Exception.class)
     public String startWorkflow(IWorkflowCallback<?> callback, Object businessKey, Map<String, Object> variables) {
         variables.putIfAbsent(EConstantValue.IWorkflowCallback.getValue(), callback.getClass().getName());
+        variables.putIfAbsent(EConstantValue.ApproveResultField.getValue(), EBoolean.True.getStringValue());
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(callback.getWorkflowDefinition().getWorkflowKey(),
                 businessKey.toString(), variables);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).singleResult();
+        List<Task> taskList = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).list();
 
-        if(null != task){
-            callback.refreshStatus(businessKey, task.getTaskDefinitionKey());
+        if(!CollectionUtils.isEmpty(taskList)){
+            callback.refreshStatus(businessKey, taskList.get(0).getTaskDefinitionKey());
             callback.refreshWorkflowInstanceId(businessKey, processInstance.getProcessInstanceId());
         }
 
@@ -96,36 +101,37 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
     @Override
     public String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, WorkflowSubmitReq submitReq) {
         return submitWorkflow(callback, businessKey, submitReq.getSubmitUserId(), submitReq.getApproveResult(),
-                submitReq.getNextTaskApproveUserId(), submitReq.getNextTaskApproveRoleId());
+                submitReq.getNextTaskApproveUserId(), submitReq.getNextTaskApproveUserIdList(), submitReq.getNextTaskApproveRoleId());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey,
-            Object submitUser, String approveResult, String nextTaskApproveUserId, String nextTaskApproveRoleId) {
+    public String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, Object submitUser,
+            String approveResult, String nextTaskApproveUserId, List<String> nextTaskApproveUserIdList, String nextTaskApproveRoleId) {
         User user = identityService.createUserQuery().userId(submitUser.toString()).singleResult();
         if(null == user){
-            throw new BizException(String.format("用户【%s】不存在", submitUser.toString()));
+            throw new ActivitiException(String.format("用户【%s】不存在", submitUser.toString()));
         }
 
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(
                 businessKey.toString(), callback.getWorkflowDefinition().getWorkflowKey()).singleResult();
         if(null == processInstance){
-            throw new BizException(String.format("业务编号【%s】在工作流【%s】中不存在可执行实例",
+            throw new ActivitiException(String.format("业务编号【%s】在工作流【%s】中不存在可执行实例",
                     businessKey.toString(), callback.getWorkflowDefinition().getWorkflowName()));
         }
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).
+                taskCandidateOrAssigned(submitUser.toString()).singleResult();
 
         if(null == task){
-            throw new BizException(String.format("业务编号【%s】在工作流【%s】中不存在可执行任务",
-                    businessKey.toString(), callback.getWorkflowDefinition().getWorkflowName()));
+            throw new ActivitiException(String.format("用户【%s】在工作流【%s】的业务编号【%s】中不存在可执行任务",
+                    user.getFirstName(), callback.getWorkflowDefinition().getWorkflowName(), businessKey.toString()));
         }
 
-        Set<String> taskUserList = listTaskUser(task);
-        if(null != taskUserList && !taskUserList.contains(submitUser.toString())){
-            throw new BizException(String.format("提交失败，用户【%s(%s)】不存在审核权限", user.getFirstName(), user.getId()));
-        }
+//        Set<String> taskUserList = listTaskUser(task);
+//        if(null != taskUserList && !taskUserList.contains(submitUser.toString())){
+//            throw new ActivitiException(String.format("提交失败，用户【%s(%s)】不存在审核权限", user.getFirstName(), user.getId()));
+//        }
 
         Map<String, Object> variables = new HashMap<>(1);
         variables.put(EConstantValue.ApproveResultField.getValue(), approveResult);
@@ -133,10 +139,13 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
         // 任务本地变量
         Map<String, Object> transientVariables = new HashMap<>(2);
         if(StringUtils.isNotBlank(nextTaskApproveUserId)){
-            transientVariables.put(EConstantValue.ApproveUserField.getValue(), nextTaskApproveUserId);
+            transientVariables.put(EConstantValue.ApproveUserIdField.getValue(), nextTaskApproveUserId);
+        }
+        if(!CollectionUtils.isEmpty(nextTaskApproveUserIdList)){
+            transientVariables.put(EConstantValue.ApproveUserIdListField.getValue(), nextTaskApproveUserIdList);
         }
         if(StringUtils.isNotBlank(nextTaskApproveRoleId)){
-            transientVariables.put(EConstantValue.ApproveRoleField.getValue(), nextTaskApproveRoleId);
+            transientVariables.put(EConstantValue.ApproveRoleIdField.getValue(), nextTaskApproveRoleId);
         }
 
         // 认领并完成任务
@@ -144,9 +153,12 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
         taskService.complete(task.getId(), variables, transientVariables);
 
         // 更新状态
-        task = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).singleResult();
-        if(null != task){
-            callback.refreshStatus(businessKey, task.getTaskDefinitionKey());
+        List<Task> taskList = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).list();
+        if(!CollectionUtils.isEmpty(taskList)){
+            Set<String> taskDefinitionKeySet = taskList.stream().map(TaskInfo::getTaskDefinitionKey).collect(Collectors.toSet());
+            if(taskDefinitionKeySet.size() == 1){
+                callback.refreshStatus(businessKey, taskDefinitionKeySet.iterator().next());
+            }
         }
 
         return businessKey.toString();
@@ -259,7 +271,7 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processDefinitionKey(workflowKey)
                 .processInstanceBusinessKey(businessKey.toString()).singleResult();
         if(null == historicProcessInstance){
-            throw new BizException(String.format("业务编号【%s】不存在工作流【%s】", businessKey.toString(), workflowKey));
+            throw new ActivitiException(String.format("业务编号【%s】不存在工作流【%s】", businessKey.toString(), workflowKey));
         }
 
         HistoricActivityInstanceQuery historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery()

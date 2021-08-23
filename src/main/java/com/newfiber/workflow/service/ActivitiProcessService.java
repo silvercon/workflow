@@ -1,12 +1,12 @@
 package com.newfiber.workflow.service;
 
-import com.newfiber.core.base.WorkflowPageReq;
-import com.newfiber.core.base.WorkflowStartReq;
-import com.newfiber.core.base.WorkflowSubmitReq;
 import com.newfiber.core.result.PageInfo;
 import com.newfiber.workflow.entity.WorkflowHistoricActivity;
 import com.newfiber.workflow.entity.WorkflowUser;
 import com.newfiber.workflow.support.IWorkflowCallback;
+import com.newfiber.workflow.support.request.WorkflowPageReq;
+import com.newfiber.workflow.support.request.WorkflowStartReq;
+import com.newfiber.workflow.support.request.WorkflowSubmitReq;
 import java.util.List;
 import java.util.Map;
 
@@ -49,23 +49,24 @@ public interface ActivitiProcessService {
      * 提交工作流
      * @param callback 回调接口
      * @param businessKey 业务编号
-     * @param submitUser 提交人
-     * @param approveResult 提交结果
-     * @param nextTaskApproveUserId 下一步审核人
-     * @param nextTaskApproveRoleId 下一步审核角色
+     * @param submitReq 提交结果
      * @return 业务编号
      */
-    String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, Object submitUser, String approveResult,
-            String nextTaskApproveUserId, String nextTaskApproveRoleId);
+    String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, WorkflowSubmitReq submitReq);
 
     /**
      * 提交工作流
      * @param callback 回调接口
      * @param businessKey 业务编号
-     * @param submitReq 提交结果
+     * @param submitUser 提交人
+     * @param approveResult 提交结果
+     * @param nextTaskApproveUserId 下一步审核人
+     * @param nextTaskApproveUserIdList 下一步任务会签审核人（会签）
+     * @param nextTaskApproveRoleId 下一步审核角色
      * @return 业务编号
      */
-    String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, WorkflowSubmitReq submitReq);
+    String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, Object submitUser, String approveResult,
+            String nextTaskApproveUserId, List<String> nextTaskApproveUserIdList, String nextTaskApproveRoleId);
 
     // ************************* 根据用户列表查询工作流 ************************* //
 

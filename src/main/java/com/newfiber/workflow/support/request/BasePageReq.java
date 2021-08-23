@@ -1,4 +1,4 @@
-package com.newfiber.core.base;
+package com.newfiber.workflow.support.request;
 
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.Min;

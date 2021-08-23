@@ -2,8 +2,8 @@ package com.newfiber.workflow.support.page;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.newfiber.core.base.WorkflowPageReq;
 import com.newfiber.workflow.support.IWorkflowCallback;
+import com.newfiber.workflow.support.request.WorkflowPageReq;
 
 /**
  * 工作流分页工具类

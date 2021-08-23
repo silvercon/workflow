@@ -1,7 +1,7 @@
 package com.newfiber.core.result;
 
 import com.github.pagehelper.Page;
-import com.newfiber.core.base.WorkflowPageReq;
+import com.newfiber.workflow.support.request.WorkflowPageReq;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.util.Collection;

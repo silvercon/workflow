@@ -1,7 +1,7 @@
 package com.newfiber.workflow.utils;
 
-import com.newfiber.core.base.BasePageReq;
 import com.newfiber.core.result.PageInfo;
+import com.newfiber.workflow.support.request.BasePageReq;
 import java.util.List;
 
 /**

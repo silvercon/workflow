@@ -22,12 +22,6 @@ public class WorkflowModeCreateRequest {
     private String name;
 
     /**
-     * 流程定义json
-     */
-    @ApiModelProperty(name = "jsonXml", value = "流程定义json")
-    private String jsonXml;
-
-    /**
      * 描述
      */
     @ApiModelProperty(name = "description", value = "描述")

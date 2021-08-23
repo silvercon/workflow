@@ -1,6 +1,6 @@
 package com.newfiber.workflow.entity.request;
 
-import com.newfiber.core.base.BasePageReq;
+import com.newfiber.workflow.support.request.BasePageReq;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 

@@ -1,7 +1,8 @@
-package com.newfiber.core.base;
+package com.newfiber.workflow.support.request;
 
 import com.newfiber.workflow.support.IWorkflowCallback;
 import io.swagger.annotations.ApiModelProperty;
+import java.util.List;
 import lombok.Data;
 
 /**
@@ -22,6 +23,12 @@ public class WorkflowStartReq {
      */
     @ApiModelProperty(name = "nextTaskApproveUserId", value = "下一步任务审核人")
     private String nextTaskApproveUserId;
+
+    /**
+     * 下一步任务会签审核人（会签）
+     */
+    @ApiModelProperty(name = "nextTaskApproveUserIdList", value = "下一步任务会签审核人")
+    private List<String> nextTaskApproveUserIdList;
 
     /**
      * 下一步任务审核角色

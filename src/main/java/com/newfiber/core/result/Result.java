@@ -40,13 +40,7 @@ public class Result<T> {
 
     public Result(String code, T object) {
         this.code = code;
-
-        if(object instanceof String){
-            this.message = object.toString();
-        }else{
-            this.data = object;
-        }
-
+        this.data = object;
     }
 
     public Result(String code, String message, T data) {
@@ -54,5 +48,4 @@ public class Result<T> {
         this.message = message;
         this.data = data;
     }
-
 }

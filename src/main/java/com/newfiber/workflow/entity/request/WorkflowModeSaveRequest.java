@@ -5,14 +5,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class WorkflowModeModifyRequest {
-
-    /**
-     * 编号
-     */
-    @NotNull
-    @ApiModelProperty(name = "modelId", value = "编号", required = true)
-    private String modelId;
+public class WorkflowModeSaveRequest {
 
     /**
      * 关键字
@@ -33,6 +26,12 @@ public class WorkflowModeModifyRequest {
      */
     @ApiModelProperty(name = "jsonXml", value = "流程定义json")
     private String jsonXml;
+
+    /**
+     * 流程定义svg
+     */
+    @ApiModelProperty(name = "svgXml", value = "流程定义svg")
+    private String svgXml;
 
     /**
      * 描述
