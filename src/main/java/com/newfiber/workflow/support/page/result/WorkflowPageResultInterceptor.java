@@ -43,7 +43,8 @@ public class WorkflowPageResultInterceptor implements Interceptor{
             BeanHandler<?> beanHandler = BeanHandler.create(classType);
             WorkflowPageResult workflowPageResult = (WorkflowPageResult) beanHandler.handle(resultSet);
             while(null != workflowPageResult){
-                // TODO 会签的执行人
+                // 会签的执行人
+                workflowPageResult.setCountersignUserList(null);
 
                 resultList.add(workflowPageResult);
                 workflowPageResult = (WorkflowPageResult) beanHandler.handle(resultSet);

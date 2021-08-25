@@ -4,14 +4,20 @@ import com.newfiber.workflow.support.IWorkflowCallback;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
 import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 工作流任务提交请求，业务请求继承该类
  * @see com.newfiber.workflow.service.ActivitiProcessService#submitWorkflow(IWorkflowCallback, Object, WorkflowSubmitReq)
  */
 @Data
-public class WorkflowSubmitReq {
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class WorkflowSubmitReq{
 
     /**
      * 审核结果，流程图变量${approveResult}
@@ -44,5 +50,11 @@ public class WorkflowSubmitReq {
      */
     @ApiModelProperty(name = "nextTaskApproveRoleId", value = "下一步任务审核角色")
     private String nextTaskApproveRoleId;
+
+    /**
+     * 消息模板参数
+     */
+    @ApiModelProperty(name = "notificationTemplateArgs", value = "消息模板参数")
+    private List<String> notificationTemplateArgs;
 
 }

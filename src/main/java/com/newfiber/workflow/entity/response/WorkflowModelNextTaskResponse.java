@@ -32,8 +32,6 @@ public class WorkflowModelNextTaskResponse {
     @ApiModelProperty(name = "conditionExpression", value = "条件表达式")
     private String conditionExpression;
 
-    // TODO
-
     public WorkflowModelNextTaskResponse(String nextTaskKey, String nextTaskName) {
         this.nextTaskKey = nextTaskKey;
         this.nextTaskName = nextTaskName;

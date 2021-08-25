@@ -1,5 +1,6 @@
 package com.newfiber.workflow.support;
 
+import com.newfiber.workflow.support.notification.IWorkflowNotification;
 import com.newfiber.workflow.utils.ReflectionKit;
 
 /**
@@ -13,7 +14,7 @@ public interface IWorkflowCallback<T> {
      * 业务实体类型
      * @return 业务实体类型
      */
-    default Class<?> getEntityClass(){
+     default Class<?> getEntityClass(){
         return ReflectionKit.getInterfaceGeneric(this);
     }
 
@@ -37,4 +38,11 @@ public interface IWorkflowCallback<T> {
      */
     void refreshStatus(Object businessKey, String status);
 
+    /**
+     * 工作流通知
+     * @return 工作流通知
+     */
+    default IWorkflowNotification[] getWorkflowNotification(){
+        return null;
+    }
 }

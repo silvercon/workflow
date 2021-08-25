@@ -63,10 +63,32 @@ public interface ActivitiProcessService {
      * @param nextTaskApproveUserId 下一步审核人
      * @param nextTaskApproveUserIdList 下一步任务会签审核人（会签）
      * @param nextTaskApproveRoleId 下一步审核角色
+     * @param notificationTemplateArgs 消息模板参数
      * @return 业务编号
      */
     String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, Object submitUser, String approveResult,
-            String nextTaskApproveUserId, List<String> nextTaskApproveUserIdList, String nextTaskApproveRoleId);
+            String nextTaskApproveUserId, List<String> nextTaskApproveUserIdList, String nextTaskApproveRoleId,
+            List<String> notificationTemplateArgs);
+
+    // ************************* 消息通知 ************************* //
+
+    /**
+     * 发送邮件通知
+     * @param email 邮箱
+     * @param content 内容
+     * @return 是否成功
+     */
+    boolean sendEmailNotification(String email, String content);
+
+    /**
+     * 发送短信通知
+     * @param mobile 手机号
+     * @param smsSign 短信签名
+     * @param smsTemplateCode 短息模板编号
+     * @param templateArgs 模板桉树
+     * @return 是否成功
+     */
+    boolean sendSmsNotification(String mobile, String smsSign, String smsTemplateCode, List<String> templateArgs);
 
     // ************************* 根据用户列表查询工作流 ************************* //
 

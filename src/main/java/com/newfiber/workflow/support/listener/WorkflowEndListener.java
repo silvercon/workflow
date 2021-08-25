@@ -10,7 +10,7 @@ import org.activiti.engine.delegate.ExecutionListener;
 /**
  * 执行流监听器
  */
-public class WorkflowExecutionListener implements ExecutionListener {
+public class WorkflowEndListener implements ExecutionListener {
 
     @Override
     public void notify(DelegateExecution execution) {

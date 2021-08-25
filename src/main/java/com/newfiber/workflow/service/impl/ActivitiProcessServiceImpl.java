@@ -12,6 +12,7 @@ import com.newfiber.workflow.support.IWorkflowCallback;
 import com.newfiber.workflow.support.request.WorkflowPageReq;
 import com.newfiber.workflow.support.request.WorkflowStartReq;
 import com.newfiber.workflow.support.request.WorkflowSubmitReq;
+import com.newfiber.workflow.utils.NotificationService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -59,6 +60,9 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
     @Resource
     private IdentityService identityService;
 
+    @Resource
+    private NotificationService notificationService;
+
     @Override
     public String startWorkflow(IWorkflowCallback<?> callback, Object businessKey) {
         return startWorkflow(callback, businessKey, new HashMap<>());
@@ -75,6 +79,9 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
         }
         if(null != startReq && !CollectionUtils.isEmpty(startReq.getNextTaskApproveUserIdList())){
             variables.put(EConstantValue.ApproveUserIdListField.getValue(), startReq.getNextTaskApproveUserIdList());
+        }
+        if(null != startReq && !CollectionUtils.isEmpty(startReq.getNotificationTemplateArgs())){
+            variables.put(EConstantValue.NotificationTemplateArgs.getValue(), startReq.getNotificationTemplateArgs());
         }
         return startWorkflow(workflowCallback, businessKey, variables);
     }
@@ -101,13 +108,15 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
     @Override
     public String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, WorkflowSubmitReq submitReq) {
         return submitWorkflow(callback, businessKey, submitReq.getSubmitUserId(), submitReq.getApproveResult(),
-                submitReq.getNextTaskApproveUserId(), submitReq.getNextTaskApproveUserIdList(), submitReq.getNextTaskApproveRoleId());
+                submitReq.getNextTaskApproveUserId(), submitReq.getNextTaskApproveUserIdList(),
+                submitReq.getNextTaskApproveRoleId(), submitReq.getNotificationTemplateArgs());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, Object submitUser,
-            String approveResult, String nextTaskApproveUserId, List<String> nextTaskApproveUserIdList, String nextTaskApproveRoleId) {
+            String approveResult, String nextTaskApproveUserId, List<String> nextTaskApproveUserIdList,
+            String nextTaskApproveRoleId, List<String> notificationTemplateArgs) {
         User user = identityService.createUserQuery().userId(submitUser.toString()).singleResult();
         if(null == user){
             throw new ActivitiException(String.format("用户【%s】不存在", submitUser.toString()));
@@ -147,6 +156,9 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
         if(StringUtils.isNotBlank(nextTaskApproveRoleId)){
             transientVariables.put(EConstantValue.ApproveRoleIdField.getValue(), nextTaskApproveRoleId);
         }
+        if(!CollectionUtils.isEmpty(notificationTemplateArgs)){
+            transientVariables.put(EConstantValue.NotificationTemplateArgs.getValue(), notificationTemplateArgs);
+        }
 
         // 认领并完成任务
         taskService.claim(task.getId(), submitUser.toString());
@@ -162,6 +174,30 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
         }
 
         return businessKey.toString();
+    }
+
+    @Override
+    public boolean sendEmailNotification(String email, String content) {
+        boolean result;
+        if(StringUtils.isBlank(email) || StringUtils.isBlank(content)){
+            result = false;
+        }else{
+            result = notificationService.sendSimpleMail(email, EConstantValue.EmailNotificationSubject.getValue(), content);
+        }
+        log.info("邮件发送{} | 邮箱：{} | 内容：{}", result ? "成功" : "失败" , email, content);
+        return result;
+    }
+
+    @Override
+    public boolean sendSmsNotification(String mobile, String smsSign, String smsTemplateCode, List<String> templateArgs) {
+        boolean result;
+        if(StringUtils.isBlank(mobile) || StringUtils.isBlank(smsSign) || StringUtils.isBlank(smsTemplateCode)){
+            result = false;
+        }else{
+            result = notificationService.sendTencentSms(mobile, smsSign, smsTemplateCode, templateArgs);
+        }
+        log.info("短信发送{} | 手机号：{} | 模板编号：{}", result ? "成功" : "失败" , mobile, smsTemplateCode);
+        return result;
     }
 
     @Override
@@ -314,24 +350,6 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
             businessKeySet.add(processInstance.getBusinessKey());
         }
         return new ArrayList<>(businessKeySet);
-    }
-
-    private Set<String> listTaskUser(Task task) {
-        Set<String> taskUserList = null;
-        List<IdentityLink> identityLinkList = taskService.getIdentityLinksForTask(task.getId());
-        if(!CollectionUtils.isEmpty(identityLinkList)){
-            taskUserList = new HashSet<>();
-            for(IdentityLink identityLink : identityLinkList){
-                if(StringUtils.isNotBlank(identityLink.getUserId())){
-                    taskUserList.add(identityLink.getUserId());
-                }
-                if(StringUtils.isNotBlank(identityLink.getGroupId())){
-                    List<User> userList = identityService.createUserQuery().memberOfGroup(identityLink.getGroupId()).list();
-                    taskUserList.addAll(userList.stream().map(User::getId).collect(Collectors.toSet()));
-                }
-            }
-        }
-        return taskUserList;
     }
 
     private TaskQuery wrapperTaskQuery(Object userId, Object groupId, String workflowKey, String taskKey) {
