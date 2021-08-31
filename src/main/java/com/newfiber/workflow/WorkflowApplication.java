@@ -26,7 +26,7 @@ public class WorkflowApplication {
     public void apiVersion(HttpServletResponse response) throws IOException {
         log.info("Successful Deployment");
         PrintWriter writer = response.getWriter();
-        writer.append("Version:1.0.0 \n");
+        writer.append("Version:1.1.0 \n");
         writer.append("Description:newfiber-workflow \n");
         writer.flush();
     }

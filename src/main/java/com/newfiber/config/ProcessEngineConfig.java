@@ -5,9 +5,8 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.spring.boot.AbstractProcessEngineAutoConfiguration;
 import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
+//@Configuration
 public class ProcessEngineConfig extends AbstractProcessEngineAutoConfiguration {
 
 //    @Bean
