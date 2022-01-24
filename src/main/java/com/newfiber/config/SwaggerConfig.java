@@ -14,7 +14,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 /**
  * Swagger2API接口文档配置
  */
-@Configuration
+//@Configuration
 @EnableSwagger2
 public class SwaggerConfig {
 

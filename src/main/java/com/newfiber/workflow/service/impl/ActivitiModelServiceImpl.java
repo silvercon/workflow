@@ -287,4 +287,21 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
         return workflowModelPageWrapper;
     }
 
+    @Override
+    public void deployWebActivitiServerFile(String workflowKey, MultipartFile multipartFile) {
+        if (StringUtils.isEmpty(workflowKey)){
+            throw new ActivitiException(String.format("workflowKey不能为空"));
+        }
+        //1.查询是否以及部署了该流程
+        List<Model> modelList = repositoryService.createModelQuery().orderByModelId().desc().list();
+        modelList = modelList.stream().filter(t -> StringUtils.isNotBlank(t.getKey()) &&
+                    t.getKey().contains(workflowKey)).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(modelList)){
+            //2.以及部署了改流程，需要删除后在来部署
+            this.delete(modelList.get(0).getId());
+        }
+        //3.上传文件模型并部署该流程
+        this.upload(workflowKey, multipartFile);
+    }
+
 }

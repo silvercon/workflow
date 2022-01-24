@@ -88,4 +88,18 @@ public class WorkflowModelController {
         return new Result<>(ResultCode.SUCCESS, activitiModelService.pageWorkflowModel(request));
     }
 
+    /**
+     *@Description: 实际项目中使用 activiti编辑的bpmn文件的部署
+     *@author chenqian
+     *@date 2022/1/24 13:23
+     *@params String workflowKey, @RequestParam MultipartFile multipartFile
+     *@return Result<Object>
+     */
+    @ApiOperation(value = "部署web工作流编辑器文件 bpmn文件")
+    @PostMapping(value = "/deployWebActivitiServerFile")
+    public Result<Object> deployWebActivitiServerFile(@RequestParam String workflowKey, @RequestParam MultipartFile multipartFile) {
+        activitiModelService.deployWebActivitiServerFile(workflowKey, multipartFile);
+        return new Result<>(ResultCode.SUCCESS);
+    }
+
 }

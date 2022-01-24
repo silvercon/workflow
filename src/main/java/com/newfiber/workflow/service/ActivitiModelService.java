@@ -66,4 +66,11 @@ public interface ActivitiModelService {
      */
     PageWrapper<WorkflowModel> pageWorkflowModel(WorkflowModelPageRequest request);
 
+    /**
+     * 实际项目中使用 activiti编辑的bpmn文件的部署
+     * @param workflowKey 分页参数,MultipartFile multipartFile
+     * @return 工作流模型
+     */
+    void deployWebActivitiServerFile(String workflowKey, MultipartFile multipartFile);
+
 }
