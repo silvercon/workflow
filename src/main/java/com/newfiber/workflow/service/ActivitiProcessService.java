@@ -192,6 +192,16 @@ public interface ActivitiProcessService {
     // ************************* 列表查询工作流历史记录 ************************* //
 
     /**
+     * 根据用户分页查询已办的业务实体编号
+     * @param workflowKey 工作流编号
+     * @param taskKey 任务编号
+     * @param userId 用户编号
+     * @param workflowPageReq 分页参数
+     * @return 代办的业务实体编号
+     */
+    PageInfo<String> pageDoneBusinessKeyByUser(String workflowKey, String taskKey, Object userId, WorkflowPageReq workflowPageReq);
+
+    /**
      * 列表查询历史活动记录
      * @param workflowKey 工作流编号
      * @param businessKey 业务实体编号

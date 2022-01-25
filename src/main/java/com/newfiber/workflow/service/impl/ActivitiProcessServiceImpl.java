@@ -295,6 +295,22 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
     }
 
     @Override
+    public PageInfo<String> pageDoneBusinessKeyByUser(String workflowKey, String taskKey, Object userId, WorkflowPageReq workflowPageReq) {
+        HistoricTaskInstanceQuery historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery().processDefinitionKey(workflowKey).finished();
+        if(null != userId && StringUtils.isNotBlank(userId.toString())){
+            historicTaskInstanceQuery.taskInvolvedUser(userId.toString());
+        }
+        if(StringUtils.isNotBlank(taskKey)){
+            historicTaskInstanceQuery.taskId(taskKey);
+        }
+        historicTaskInstanceQuery.listPage(workflowPageReq.pageStart(), workflowPageReq.getPageSize());
+
+        List<HistoricTaskInstance> taskList = historicTaskInstanceQuery.list();
+        List<String> strings = listHistoryTaskBusinessKey(taskList);
+        return new PageInfo<>(workflowPageReq, strings, historicTaskInstanceQuery.count());
+    }
+
+    @Override
     public PageInfo<String> pageTodoBusinessKeyByUser(String workflowKey, String taskKey, Object userId, WorkflowPageReq workflowPageReq) {
         TaskQuery taskQuery = wrapperTaskQuery(userId, null, workflowKey, taskKey);
         List<Task> taskList = taskQuery.listPage(workflowPageReq.pageStart(), workflowPageReq.getPageSize());
