@@ -93,6 +93,12 @@ public class WorkflowHistoricActivity implements HistoricActivityInstance {
     @ApiModelProperty(name = "deleteReason", value = "删除原因")
     private String deleteReason;
 
+	/**
+	 * 任务备注
+	 */
+	@ApiModelProperty(name = "comment", value = "任务备注")
+	private String comment;
+
     /**
      * 租户编号
      */
@@ -105,9 +111,10 @@ public class WorkflowHistoricActivity implements HistoricActivityInstance {
     @ApiModelProperty(name = "time", value = "时间")
     private Date time;
 
-    public static WorkflowHistoricActivity build(HistoricActivityInstance historicActivityInstance){
+    public static WorkflowHistoricActivity build(HistoricActivityInstance historicActivityInstance, String comment){
         WorkflowHistoricActivity workflowHistoricActivity = new WorkflowHistoricActivity();
         BeanUtils.copyProperties(historicActivityInstance, workflowHistoricActivity);
+        workflowHistoricActivity.setComment(comment);
         return workflowHistoricActivity;
     }
 }

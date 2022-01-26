@@ -35,6 +35,7 @@ import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.identity.User;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfo;
@@ -345,7 +346,15 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
 
         List<WorkflowHistoricActivity> workflowHistoricActivityList = new ArrayList<>();
         for(HistoricActivityInstance historicActivityInstance : historicActivityInstanceList){
-            workflowHistoricActivityList.add(WorkflowHistoricActivity.build(historicActivityInstance));
+        	String comment = null;
+        	if(StringUtils.isNotBlank(historicActivityInstance.getTaskId())){
+		        List<Comment> commentList = taskService.getTaskComments(historicActivityInstance.getTaskId());
+		        if (commentList.size() > 0) {
+			        comment = commentList.get(0).getFullMessage();
+		        }
+	        }
+
+            workflowHistoricActivityList.add(WorkflowHistoricActivity.build(historicActivityInstance, comment));
         }
 
         return workflowHistoricActivityList;
