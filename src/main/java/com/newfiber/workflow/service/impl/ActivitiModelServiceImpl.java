@@ -173,14 +173,25 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
         }
     }
 
-    private ObjectNode parseBpmn2Json(MultipartFile multipartFile) throws IOException, XMLStreamException {
-        InputStream bpmnStream = new ByteArrayInputStream(multipartFile.getBytes());
-        XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-        InputStreamReader inputStreamReader = new InputStreamReader(bpmnStream, StandardCharsets.UTF_8);
-        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(inputStreamReader);
-        BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xmlStreamReader);
-        return (new BpmnJsonConverter()).convertToJson(bpmnModel);
-    }
+	@Override
+	public void reUpload(String workflowKey, MultipartFile multipartFile) {
+		List<Model> modelList = repositoryService.createModelQuery().modelKey(workflowKey).list();
+		if (!CollectionUtils.isEmpty(modelList)) {
+			modelList.forEach(t -> delete(t.getId()));
+		}
+		upload(workflowKey, multipartFile);
+	}
+
+	private ObjectNode parseBpmn2Json(MultipartFile multipartFile)
+		throws IOException, XMLStreamException {
+		InputStream bpmnStream = new ByteArrayInputStream(multipartFile.getBytes());
+		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+		InputStreamReader inputStreamReader = new InputStreamReader(bpmnStream,
+			StandardCharsets.UTF_8);
+		XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(inputStreamReader);
+		BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xmlStreamReader);
+		return (new BpmnJsonConverter()).convertToJson(bpmnModel);
+	}
 
     @Override
     public List<WorkflowModelNextTaskResponse> nextTasks(String workflowKey, String currentTask) {
@@ -285,23 +296,6 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
 
         workflowModelPageWrapper.setList(workflowModelList);
         return workflowModelPageWrapper;
-    }
-
-    @Override
-    public void deployWebActivitiServerFile(String workflowKey, MultipartFile multipartFile) {
-        if (StringUtils.isEmpty(workflowKey)){
-            throw new ActivitiException(String.format("workflowKey不能为空"));
-        }
-        //1.查询是否以及部署了该流程
-        List<Model> modelList = repositoryService.createModelQuery().orderByModelId().desc().list();
-        modelList = modelList.stream().filter(t -> StringUtils.isNotBlank(t.getKey()) &&
-                    t.getKey().contains(workflowKey)).collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(modelList)){
-            //2.以及部署了改流程，需要删除后在来部署
-            this.delete(modelList.get(0).getId());
-        }
-        //3.上传文件模型并部署该流程
-        this.upload(workflowKey, multipartFile);
     }
 
 }

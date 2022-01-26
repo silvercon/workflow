@@ -19,12 +19,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class WorkflowSubmitReq{
 
-    /**
-     * 审核结果，流程图变量${approveResult}
-     */
-    @NotNull
-    @ApiModelProperty(name = "approveResult", value = "审核结果，流程图变量${approveResult}", required = true)
-    private String approveResult;
+	/**
+	 * 审核结果，流程图变量${approveResult}
+	 */
+	@NotNull
+	@ApiModelProperty(name = "approveResult", value = "审核结果，流程图变量${approveResult}", required = true)
+	private String approveResult;
+
+	/**
+	 * 审核备注
+	 */
+	@ApiModelProperty(name = "approveComment", value = "审核备注")
+	private String approveComment;
 
     /**
      * 提交人编号

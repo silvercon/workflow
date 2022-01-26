@@ -44,13 +44,18 @@ public interface ActivitiModelService {
      */
     void upload(String workflowKey, MultipartFile multipartFile);
 
-    /**
-     * 查询任务的下一步任务
-     * @param workflowKey 工作流编号
-     * @param currentTask 当前任务
-     * @return
-     */
-    List<WorkflowModelNextTaskResponse> nextTasks(String workflowKey, String currentTask);
+	/**
+	 * 上传模型文件，删除旧模型
+	 */
+	void reUpload(String workflowKey, MultipartFile multipartFile);
+
+	/**
+	 * 查询任务的下一步任务
+	 *
+	 * @param workflowKey 工作流编号
+	 * @param currentTask 当前任务
+	 */
+	List<WorkflowModelNextTaskResponse> nextTasks(String workflowKey, String currentTask);
 
     /**
      * 详细查
@@ -65,12 +70,5 @@ public interface ActivitiModelService {
      * @return 工作流模型
      */
     PageWrapper<WorkflowModel> pageWorkflowModel(WorkflowModelPageRequest request);
-
-    /**
-     * 实际项目中使用 activiti编辑的bpmn文件的部署
-     * @param workflowKey 分页参数,MultipartFile multipartFile
-     * @return 工作流模型
-     */
-    void deployWebActivitiServerFile(String workflowKey, MultipartFile multipartFile);
 
 }

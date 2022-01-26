@@ -108,14 +108,14 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
     @Override
     public String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, WorkflowSubmitReq submitReq) {
         return submitWorkflow(callback, businessKey, submitReq.getSubmitUserId(), submitReq.getApproveResult(),
-                submitReq.getNextTaskApproveUserId(), submitReq.getNextTaskApproveUserIdList(),
-                submitReq.getNextTaskApproveRoleId(), submitReq.getNotificationTemplateArgs());
+	        submitReq.getApproveComment(), submitReq.getNextTaskApproveUserId(),
+	        submitReq.getNextTaskApproveUserIdList(), submitReq.getNextTaskApproveRoleId(), submitReq.getNotificationTemplateArgs());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, Object submitUser,
-            String approveResult, String nextTaskApproveUserId, List<String> nextTaskApproveUserIdList,
+    public String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, Object submitUser, String approveResult,
+	        String approveComment, String nextTaskApproveUserId, List<String> nextTaskApproveUserIdList,
             String nextTaskApproveRoleId, List<String> notificationTemplateArgs) {
         User user = identityService.createUserQuery().userId(submitUser.toString()).singleResult();
         if(null == user){
@@ -160,9 +160,12 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
             transientVariables.put(EConstantValue.NotificationTemplateArgs.getValue(), notificationTemplateArgs);
         }
 
-        // 认领并完成任务
-        taskService.claim(task.getId(), submitUser.toString());
-        taskService.complete(task.getId(), variables, transientVariables);
+		// 认领并完成任务
+		if (StringUtils.isNotBlank(approveComment)) {
+			taskService.addComment(task.getId(), task.getProcessInstanceId(), approveComment);
+		}
+		taskService.claim(task.getId(), submitUser.toString());
+		taskService.complete(task.getId(), variables, transientVariables);
 
         // 更新状态
         List<Task> taskList = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).list();

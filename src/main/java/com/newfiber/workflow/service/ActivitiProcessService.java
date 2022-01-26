@@ -56,10 +56,12 @@ public interface ActivitiProcessService {
 
     /**
      * 提交工作流
+     *
      * @param callback 回调接口
      * @param businessKey 业务编号
      * @param submitUser 提交人
      * @param approveResult 提交结果
+     * @param approveComment 提交备注
      * @param nextTaskApproveUserId 下一步审核人
      * @param nextTaskApproveUserIdList 下一步任务会签审核人（会签）
      * @param nextTaskApproveRoleId 下一步审核角色
@@ -67,8 +69,8 @@ public interface ActivitiProcessService {
      * @return 业务编号
      */
     String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, Object submitUser, String approveResult,
-            String nextTaskApproveUserId, List<String> nextTaskApproveUserIdList, String nextTaskApproveRoleId,
-            List<String> notificationTemplateArgs);
+	    String approveComment, String nextTaskApproveUserId, List<String> nextTaskApproveUserIdList,
+	    String nextTaskApproveRoleId, List<String> notificationTemplateArgs);
 
     // ************************* 消息通知 ************************* //
 
@@ -168,38 +170,41 @@ public interface ActivitiProcessService {
 
     // ************************* 分页查询工作流 ************************* //
 
-    /**
-     * 根据用户查询代办的业务实体编号
-     * @param workflowKey 工作流编号
-     * @param taskKey 任务编号
-     * @param userId 用户编号
-     * @param workflowPageReq 分页参数
-     * @return 代办的业务实体编号
-     */
-    PageInfo<String> pageTodoBusinessKeyByUser(String workflowKey, String taskKey, Object userId, WorkflowPageReq workflowPageReq);
+	/**
+	 * 根据用户查询代办的业务实体编号
+	 *
+	 * @param workflowKey 工作流编号
+	 * @param taskKey 任务编号
+	 * @param userId 用户编号
+	 * @param workflowPageReq 分页参数
+	 * @return 代办的业务实体编号
+	 */
+	PageInfo<String> pageTodoBusinessKeyByUser(String workflowKey, String taskKey, Object userId, WorkflowPageReq workflowPageReq);
 
-    /**
-     * 查询代办的业务实体编号
-     * @param workflowKey 工作流编号
-     * @param taskKey 任务编号
-     * @param groupId 用户组编号
-     * @param userId 用户编号
-     * @param workflowPageReq 分页参数
-     * @return 代办的业务实体编号
-     */
-    PageInfo<String> pageTodoBusinessKey(String workflowKey, String taskKey, Object groupId, Object userId, WorkflowPageReq workflowPageReq);
+	/**
+	 * 根据用户分页查询已办的业务实体编号
+	 *
+	 * @param workflowKey 工作流编号
+	 * @param taskKey 任务编号
+	 * @param userId 用户编号
+	 * @param workflowPageReq 分页参数
+	 * @return 代办的业务实体编号
+	 */
+	PageInfo<String> pageDoneBusinessKeyByUser(String workflowKey, String taskKey, Object userId, WorkflowPageReq workflowPageReq);
 
-    // ************************* 列表查询工作流历史记录 ************************* //
+	/**
+	 * 查询代办的业务实体编号
+	 *
+	 * @param workflowKey 工作流编号
+	 * @param taskKey 任务编号
+	 * @param groupId 用户组编号
+	 * @param userId 用户编号
+	 * @param workflowPageReq 分页参数
+	 * @return 代办的业务实体编号
+	 */
+	PageInfo<String> pageTodoBusinessKey(String workflowKey, String taskKey, Object groupId, Object userId, WorkflowPageReq workflowPageReq);
 
-    /**
-     * 根据用户分页查询已办的业务实体编号
-     * @param workflowKey 工作流编号
-     * @param taskKey 任务编号
-     * @param userId 用户编号
-     * @param workflowPageReq 分页参数
-     * @return 代办的业务实体编号
-     */
-    PageInfo<String> pageDoneBusinessKeyByUser(String workflowKey, String taskKey, Object userId, WorkflowPageReq workflowPageReq);
+	// ************************* 列表查询工作流历史记录 ************************* //
 
     /**
      * 列表查询历史活动记录

@@ -62,12 +62,19 @@ public class WorkflowModelController {
         return new Result<>(ResultCode.SUCCESS);
     }
 
-    @ApiOperation(value = "上传工作流文件")
-    @PostMapping(value = "/upload")
-    public Result<Object> upload(@RequestParam String workflowKey, @RequestParam MultipartFile multipartFile) {
-        activitiModelService.upload(workflowKey, multipartFile);
-        return new Result<>(ResultCode.SUCCESS);
-    }
+	@ApiOperation(value = "上传工作流文件")
+	@PostMapping(value = "/upload")
+	public Result<Object> upload(@RequestParam String workflowKey, @RequestParam MultipartFile multipartFile) {
+		activitiModelService.upload(workflowKey, multipartFile);
+		return new Result<>(ResultCode.SUCCESS);
+	}
+
+	@ApiOperation(value = "重新上传工作流文件")
+	@PostMapping(value = "/deployWebActivitiServerFile")
+	public Result<Object> reUpload(@RequestParam String workflowKey, @RequestParam MultipartFile multipartFile) {
+		activitiModelService.reUpload(workflowKey, multipartFile);
+		return new Result<>(ResultCode.SUCCESS);
+	}
 
     @ApiOperation(value = "下一步任务信息")
     @PostMapping(value = "/nextTasks")
@@ -86,20 +93,6 @@ public class WorkflowModelController {
     @PostMapping(value = "/page")
     public Result<PageInfo<WorkflowModel>> page(@RequestBody @Valid WorkflowModelPageRequest request) {
         return new Result<>(ResultCode.SUCCESS, activitiModelService.pageWorkflowModel(request));
-    }
-
-    /**
-     *@Description: 实际项目中使用 activiti编辑的bpmn文件的部署
-     *@author chenqian
-     *@date 2022/1/24 13:23
-     *@params String workflowKey, @RequestParam MultipartFile multipartFile
-     *@return Result<Object>
-     */
-    @ApiOperation(value = "部署web工作流编辑器文件 bpmn文件")
-    @PostMapping(value = "/deployWebActivitiServerFile")
-    public Result<Object> deployWebActivitiServerFile(@RequestParam String workflowKey, @RequestParam MultipartFile multipartFile) {
-        activitiModelService.deployWebActivitiServerFile(workflowKey, multipartFile);
-        return new Result<>(ResultCode.SUCCESS);
     }
 
 }
