@@ -12,7 +12,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +29,13 @@ public class WorkflowProcessController {
     @Resource
     private ActivitiProcessService activitiProcessService;
 
-    @ApiOperation(value = "列表查询待办业务的可执行人")
+	@ApiOperation(value = "获取流程节点进程图")
+	@GetMapping(value = "diagram-view/{workflowInstanceId}")
+	public void diagramView(@PathVariable("workflowInstanceId") String workflowInstanceId, HttpServletResponse httpServletResponse) {
+		activitiProcessService.diagram(workflowInstanceId, httpServletResponse);
+	}
+
+	@ApiOperation(value = "列表查询待办业务的可执行人")
     @PostMapping(value = "list-todo-business-executor")
     public Result<List<WorkflowUser>> listTodoBusinessExecutor(@Valid @RequestBody WorkflowTodoBusinessExecutorListRequest request) {
         return new Result<>(ResultCode.SUCCESS, activitiProcessService.listTodoBusinessExecutor(request.getWorkflowKey(), request.getBusinessKey()));

@@ -9,6 +9,7 @@ import com.newfiber.workflow.support.request.WorkflowStartReq;
 import com.newfiber.workflow.support.request.WorkflowSubmitReq;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 工作流过程
@@ -214,4 +215,12 @@ public interface ActivitiProcessService {
      */
     List<WorkflowHistoricActivity> listHistoricActivity(String workflowKey, Object businessKey, String workflowUserId, String status);
 
+	// ************************* 其他 ************************* //
+
+	/**
+	 * 获取流程节点进程图
+	 * @param workflowInstanceId 工作流实例编号
+	 * @param httpServletResponse response
+	 */
+	void diagram(String workflowInstanceId, HttpServletResponse httpServletResponse);
 }

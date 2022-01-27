@@ -13,6 +13,9 @@ import com.newfiber.workflow.support.request.WorkflowPageReq;
 import com.newfiber.workflow.support.request.WorkflowStartReq;
 import com.newfiber.workflow.support.request.WorkflowSubmitReq;
 import com.newfiber.workflow.utils.NotificationService;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,10 +25,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
+import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.history.HistoricActivityInstance;
@@ -34,12 +42,14 @@ import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.identity.User;
+import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskInfo;
 import org.activiti.engine.task.TaskQuery;
+import org.activiti.image.ProcessDiagramGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +73,12 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
 
     @Resource
     private NotificationService notificationService;
+
+    @Resource
+    private RepositoryService repositoryService;
+
+    @Resource
+    private ProcessEngine processEngine;
 
     @Override
     public String startWorkflow(IWorkflowCallback<?> callback, Object businessKey) {
@@ -360,7 +376,59 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
         return workflowHistoricActivityList;
     }
 
-    private ArrayList<String> listTaskBusinessKey(List<Task> taskList) {
+	@Override
+	public void diagram(String workflowInstanceId, HttpServletResponse httpServletResponse) {
+		// 获得当前活动的节点
+		String processDefinitionId;
+		// 如果流程已经结束，则得到结束节点
+		if (this.isFinished(workflowInstanceId)) {
+			HistoricProcessInstance pi = historyService.createHistoricProcessInstanceQuery().processInstanceId(workflowInstanceId).singleResult();
+			processDefinitionId = pi.getProcessDefinitionId();
+		} else {
+			// 如果流程没有结束，则取当前活动节点
+			// 根据流程实例ID获得当前处于活动状态的ActivityId合集
+			ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(workflowInstanceId).singleResult();
+			processDefinitionId = pi.getProcessDefinitionId();
+		}
+		List<String> highLightedActivities = new ArrayList<>();
+
+		// 获得活动的节点
+		List<HistoricActivityInstance> highLightedActivityList = historyService.createHistoricActivityInstanceQuery().processInstanceId(workflowInstanceId).orderByHistoricActivityInstanceStartTime().asc().list();
+
+		for (HistoricActivityInstance tempActivity : highLightedActivityList) {
+			String activityId = tempActivity.getActivityId();
+			highLightedActivities.add(activityId);
+		}
+
+		List<String> flows = new ArrayList<>();
+		// 获取流程图
+		BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
+		ProcessEngineConfiguration engConf = processEngine.getProcessEngineConfiguration();
+
+		ProcessDiagramGenerator diagramGenerator = engConf.getProcessDiagramGenerator();
+		InputStream in = diagramGenerator.generateDiagram(bpmnModel, "bmp", highLightedActivities, flows, engConf.getActivityFontName(),
+			engConf.getLabelFontName(), engConf.getAnnotationFontName(), engConf.getClassLoader(), 1.0);
+		OutputStream out = null;
+		byte[] buf = new byte[1024];
+		int length;
+		try {
+			out = httpServletResponse.getOutputStream();
+			while ((length = in.read(buf)) != -1) {
+				out.write(buf, 0, length);
+			}
+		} catch (IOException e) {
+			log.error("操作异常", e);
+		} finally {
+			IoUtil.closeSilently(out);
+			IoUtil.closeSilently(in);
+		}
+	}
+
+	private boolean isFinished(String processInstanceId) {
+		return historyService.createHistoricProcessInstanceQuery().finished().processInstanceId(processInstanceId).count() > 0;
+	}
+
+	private ArrayList<String> listTaskBusinessKey(List<Task> taskList) {
         Set<String> businessKeySet = new HashSet<>();
         Set<String> processInstanceIdSet = taskList.stream().map(TaskInfo::getProcessInstanceId).collect(Collectors.toSet());
         for(String processInstanceId : processInstanceIdSet){
