@@ -406,8 +406,7 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
 		ProcessEngineConfiguration engConf = processEngine.getProcessEngineConfiguration();
 
 		ProcessDiagramGenerator diagramGenerator = engConf.getProcessDiagramGenerator();
-		InputStream in = diagramGenerator.generateDiagram(bpmnModel, "bmp", highLightedActivities, flows, engConf.getActivityFontName(),
-			engConf.getLabelFontName(), engConf.getAnnotationFontName(), engConf.getClassLoader(), 1.0);
+		InputStream in = diagramGenerator.generateDiagram(bpmnModel, "bmp", highLightedActivities, flows, "宋体", "宋体", "宋体", engConf.getClassLoader(), 1.0);
 		OutputStream out = null;
 		byte[] buf = new byte[1024];
 		int length;
