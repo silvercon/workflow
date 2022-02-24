@@ -1,5 +1,7 @@
 package com.newfiber.workflow.service.impl;
 
+import com.newfiber.core.diagram.ActivitiWorkflowConstants;
+import com.newfiber.core.diagram.CustomProcessDiagramGenerator;
 import com.newfiber.core.result.PageInfo;
 import com.newfiber.workflow.entity.WorkflowHistoricActivity;
 import com.newfiber.workflow.entity.WorkflowUser;
@@ -13,6 +15,7 @@ import com.newfiber.workflow.support.request.WorkflowPageReq;
 import com.newfiber.workflow.support.request.WorkflowStartReq;
 import com.newfiber.workflow.support.request.WorkflowSubmitReq;
 import com.newfiber.workflow.utils.NotificationService;
+import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -42,7 +45,9 @@ import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.identity.User;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.impl.util.IoUtil;
+import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Comment;
 import org.activiti.engine.task.IdentityLink;
@@ -380,6 +385,8 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
 	public void diagram(String workflowInstanceId, HttpServletResponse httpServletResponse) {
 		// 获得当前活动的节点
 		String processDefinitionId;
+		Set<String> currIds = Collections.emptySet();
+
 		// 如果流程已经结束，则得到结束节点
 		if (this.isFinished(workflowInstanceId)) {
 			HistoricProcessInstance pi = historyService.createHistoricProcessInstanceQuery().processInstanceId(workflowInstanceId).singleResult();
@@ -389,6 +396,8 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
 			// 根据流程实例ID获得当前处于活动状态的ActivityId合集
 			ProcessInstance pi = runtimeService.createProcessInstanceQuery().processInstanceId(workflowInstanceId).singleResult();
 			processDefinitionId = pi.getProcessDefinitionId();
+
+			currIds = runtimeService.createExecutionQuery().processInstanceId(pi.getId()).list().stream().map(Execution::getActivityId).collect(Collectors.toSet());
 		}
 		List<String> highLightedActivities = new ArrayList<>();
 
@@ -403,10 +412,10 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
 		List<String> flows = new ArrayList<>();
 		// 获取流程图
 		BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionId);
-		ProcessEngineConfiguration engConf = processEngine.getProcessEngineConfiguration();
 
-		ProcessDiagramGenerator diagramGenerator = engConf.getProcessDiagramGenerator();
-		InputStream in = diagramGenerator.generateDiagram(bpmnModel, "bmp", highLightedActivities, flows, "宋体", "宋体", "宋体", engConf.getClassLoader(), 1.0);
+		CustomProcessDiagramGenerator diagramGenerator = new CustomProcessDiagramGenerator();
+		InputStream in = diagramGenerator.generateDiagram(bpmnModel, "png", highLightedActivities, flows, "宋体", "宋体", "宋体",
+			null, 1.0, new Color[] { ActivitiWorkflowConstants.COLOR_NORMAL, ActivitiWorkflowConstants.COLOR_CURRENT }, currIds);
 		OutputStream out = null;
 		byte[] buf = new byte[1024];
 		int length;
