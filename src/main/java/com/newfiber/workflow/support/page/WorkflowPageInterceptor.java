@@ -1,12 +1,14 @@
 package com.newfiber.workflow.support.page;
 
 import cn.hutool.core.util.ReflectUtil;
+import com.newfiber.workflow.enums.EQueryScope;
 import com.newfiber.workflow.service.ActivitiProcessService;
 import com.newfiber.workflow.support.IWorkflowCallback;
 import com.newfiber.workflow.utils.ApplicationContextProvider;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,11 +42,15 @@ import org.springframework.util.CollectionUtils;
 )
 public class WorkflowPageInterceptor implements Interceptor{
 
-    private ActivitiProcessService activitiProcessService;
+    private final ActivitiProcessService activitiProcessService;
 
     private final Map<Class<?>, EntityInfo> classEntityInfoMap = new HashMap<>();
 
-    @Override
+	{
+		activitiProcessService = ApplicationContextProvider.getBean(ActivitiProcessService.class);
+	}
+
+	@Override
     public Object intercept(Invocation invocation) throws Throwable {
         WorkflowPage workflowPage = WorkflowPageHelper.getWorkflowPage();
         if(null == workflowPage){
@@ -55,13 +61,10 @@ public class WorkflowPageInterceptor implements Interceptor{
             return invocation.proceed();
         }
 
-        resourceCheck();
-
         // 待办/已完成的业务编号
-        List<String> businessKeyList = activitiProcessService.listInvolvedBusinessKeyByUser(
-                workflowPage.getWorkflowCallback(), workflowPage.getTaskKey(), workflowPage.getUserId());
+	    List<String> businessKeyList = getQueryScopeBusinessKeyList(workflowPage);
 
-        Object[] args = invocation.getArgs();
+	    Object[] args = invocation.getArgs();
         MappedStatement mappedStatement = (MappedStatement) args[0];
         Object parameterObject = args[1];
         BoundSql boundSql = mappedStatement.getBoundSql(parameterObject);
@@ -87,7 +90,25 @@ public class WorkflowPageInterceptor implements Interceptor{
         return invocation.proceed();
     }
 
-    @Override
+	private List<String> getQueryScopeBusinessKeyList(WorkflowPage workflowPage) {
+		List<String> businessKeyList = Collections.emptyList();
+		EQueryScope queryScope = EQueryScope.match(workflowPage.getQueryScope());
+		switch (queryScope){
+			case All:
+				businessKeyList = activitiProcessService.listInvolvedBusinessKeyByUser(workflowPage.getWorkflowCallback(), workflowPage.getTaskKey(), workflowPage.getUserId());
+			    break;
+			case Todo:
+				businessKeyList = activitiProcessService.listTodoBusinessKeyByUser(workflowPage.getWorkflowCallback(), workflowPage.getTaskKey(), workflowPage.getUserId());
+				break;
+			case Done:
+				businessKeyList = activitiProcessService.listTaskDoneBusinessKeyByUser(workflowPage.getWorkflowCallback(), workflowPage.getTaskKey(), workflowPage.getUserId());
+				break;
+			default: break;
+		}
+		return businessKeyList;
+	}
+
+	@Override
     public Object plugin(Object target) {
         return Plugin.wrap(target, this);
     }
@@ -237,12 +258,6 @@ public class WorkflowPageInterceptor implements Interceptor{
         builder.flushCacheRequired(ms.isFlushCacheRequired());
         builder.useCache(ms.isUseCache());
         return builder.build();
-    }
-
-    private void resourceCheck(){
-        if(null == activitiProcessService){
-            activitiProcessService = ApplicationContextProvider.getBean(ActivitiProcessService.class);
-        }
     }
 
     static class BoundSqlSqlSource implements SqlSource {

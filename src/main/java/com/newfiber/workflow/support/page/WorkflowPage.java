@@ -1,6 +1,7 @@
 package com.newfiber.workflow.support.page;
 
 import com.newfiber.workflow.support.IWorkflowCallback;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -18,12 +19,17 @@ public class WorkflowPage {
      */
     private String taskKey;
 
+	/**
+	 * 查询范围（EQueryScope）
+	 */
+	private String queryScope;
+
     /**
      * 回调接口
      */
     private IWorkflowCallback<?> workflowCallback;
 
-    public static WorkflowPage build(Object userId, String taskKey, IWorkflowCallback<?> workflowCallback){
-        return new WorkflowPage(userId.toString(), taskKey, workflowCallback);
+    public static WorkflowPage build(Object userId, String taskKey, String queryScope, IWorkflowCallback<?> workflowCallback){
+        return new WorkflowPage(userId.toString(), taskKey, queryScope, workflowCallback);
     }
 }

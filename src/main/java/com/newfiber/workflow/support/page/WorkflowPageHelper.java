@@ -2,6 +2,7 @@ package com.newfiber.workflow.support.page;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.newfiber.workflow.enums.EQueryScope;
 import com.newfiber.workflow.support.IWorkflowCallback;
 import com.newfiber.workflow.support.request.WorkflowPageReq;
 
@@ -24,7 +25,7 @@ public class WorkflowPageHelper extends PageHelper {
      */
     public static <E> Page<E> startPage(int pageNum, int pageSize, String orderBy, Object userId, String taskKey, IWorkflowCallback<?> workflowCallback) {
         Page<E> page = startPage(pageNum, pageSize, orderBy);
-        LOCAL_WORKFLOW_PAGE.set(WorkflowPage.build(userId, taskKey, workflowCallback));
+        LOCAL_WORKFLOW_PAGE.set(WorkflowPage.build(userId, taskKey, EQueryScope.All.getKey(), workflowCallback));
         return page;
     }
 
@@ -36,7 +37,7 @@ public class WorkflowPageHelper extends PageHelper {
      */
     public static <E> Page<E> startPage(WorkflowPageReq workflowPageReq, IWorkflowCallback<?> workflowCallback) {
         Page<E> page = startPage(workflowPageReq.getPageNum(), workflowPageReq.getPageSize(), workflowPageReq.getOrderBy());
-        LOCAL_WORKFLOW_PAGE.set(WorkflowPage.build(workflowPageReq.getWorkflowUserId(), workflowPageReq.getStatus(), workflowCallback));
+        LOCAL_WORKFLOW_PAGE.set(WorkflowPage.build(workflowPageReq.getWorkflowUserId(), workflowPageReq.getStatus(), workflowPageReq.getQueryScope(), workflowCallback));
         return page;
     }
 
@@ -47,7 +48,7 @@ public class WorkflowPageHelper extends PageHelper {
      * @param workflowCallback 回调接口
      */
     public static void startPage(Object userId, String taskKey, IWorkflowCallback<?> workflowCallback) {
-        LOCAL_WORKFLOW_PAGE.set(WorkflowPage.build(userId, taskKey, workflowCallback));
+        LOCAL_WORKFLOW_PAGE.set(WorkflowPage.build(userId, taskKey, EQueryScope.All.getKey(), workflowCallback));
     }
 
     public static WorkflowPage getWorkflowPage(){
