@@ -24,6 +24,8 @@ public class WorkflowPageHelper extends PageHelper {
      * @return 分页参数实体
      */
     public static <E> Page<E> startPage(int pageNum, int pageSize, String orderBy, Object userId, String taskKey, IWorkflowCallback<?> workflowCallback) {
+	    PageHelper.clearPage();
+	    WorkflowPageHelper.clearPage();
         Page<E> page = startPage(pageNum, pageSize, orderBy);
         LOCAL_WORKFLOW_PAGE.set(WorkflowPage.build(userId, taskKey, EQueryScope.All.getKey(), workflowCallback));
         return page;
@@ -36,6 +38,8 @@ public class WorkflowPageHelper extends PageHelper {
      * @return 分页参数实体
      */
     public static <E> Page<E> startPage(WorkflowPageReq workflowPageReq, IWorkflowCallback<?> workflowCallback) {
+	    PageHelper.clearPage();
+	    WorkflowPageHelper.clearPage();
         Page<E> page = startPage(workflowPageReq.getPageNum(), workflowPageReq.getPageSize(), workflowPageReq.getOrderBy());
         LOCAL_WORKFLOW_PAGE.set(WorkflowPage.build(workflowPageReq.getWorkflowUserId(), workflowPageReq.getStatus(), workflowPageReq.getQueryScope(), workflowCallback));
         return page;
@@ -48,6 +52,8 @@ public class WorkflowPageHelper extends PageHelper {
      * @param workflowCallback 回调接口
      */
     public static void startPage(Object userId, String taskKey, IWorkflowCallback<?> workflowCallback) {
+	    PageHelper.clearPage();
+	    WorkflowPageHelper.clearPage();
         LOCAL_WORKFLOW_PAGE.set(WorkflowPage.build(userId, taskKey, EQueryScope.All.getKey(), workflowCallback));
     }
 
