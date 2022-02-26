@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
-import org.activiti.engine.identity.Group;
+import org.flowable.idm.api.Group;
 
 @Data
 public class WorkflowGroup implements Group {

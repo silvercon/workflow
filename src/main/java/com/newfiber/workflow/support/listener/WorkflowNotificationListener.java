@@ -16,14 +16,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.delegate.DelegateTask;
-import org.activiti.engine.delegate.TaskListener;
-import org.activiti.engine.identity.User;
-import org.activiti.engine.runtime.ProcessInstance;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.delegate.DelegateTask;
+import org.flowable.engine.delegate.TaskListener;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.idm.api.User;
 import org.springframework.util.CollectionUtils;
 
 /**

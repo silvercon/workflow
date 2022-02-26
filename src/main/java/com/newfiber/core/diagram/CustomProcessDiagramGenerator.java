@@ -2,9 +2,9 @@ package com.newfiber.core.diagram;
 
 
 
-import org.activiti.bpmn.model.*;
-import org.activiti.bpmn.model.Process;
-import org.activiti.image.impl.DefaultProcessDiagramGenerator;
+import org.flowable.bpmn.model.*;
+import org.flowable.bpmn.model.Process;
+import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -51,14 +51,14 @@ public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerato
 		// Draw pool shape, if process is participant in collaboration
 		for (Pool pool : bpmnModel.getPools()) {
 			GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(pool.getId());
-			processDiagramCanvas.drawPoolOrLane(pool.getName(), graphicInfo);
+			processDiagramCanvas.drawPoolOrLane(pool.getName(), graphicInfo, 1.0);
 		}
 
 		// Draw lanes
 		for (Process process : bpmnModel.getProcesses()) {
 			for (Lane lane : process.getLanes()) {
 				GraphicInfo graphicInfo = bpmnModel.getGraphicInfo(lane.getId());
-				processDiagramCanvas.drawPoolOrLane(lane.getName(), graphicInfo);
+				processDiagramCanvas.drawPoolOrLane(lane.getName(), graphicInfo, 1.0);
 			}
 		}
 
@@ -358,6 +358,7 @@ public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerato
 
 		return new ByteArrayInputStream(bs.toByteArray());
 	}
+
 	@Override
 	public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, String activityFontName, String labelFontName, String annotationFontName, ClassLoader customClassLoader) {
 		return generateDiagram(bpmnModel, imageType, Collections.<String>emptyList(), Collections.<String>emptyList(),

@@ -1,6 +1,5 @@
-spring:
-    activiti:
-        database-schema-update: true
-        check-process-definitions: false
-        history-level: full
-        async-executor-activate: false
+flowable:
+    database-schema-update: true
+    check-process-definitions: false
+    history-level: full
+    async-executor-activate: false

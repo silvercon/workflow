@@ -3,7 +3,7 @@ package com.newfiber.workflow.entity;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
 import lombok.Data;
-import org.activiti.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.springframework.beans.BeanUtils;
 
 @Data

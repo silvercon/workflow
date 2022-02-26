@@ -26,19 +26,19 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.ExclusiveGateway;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.bpmn.model.Task;
-import org.activiti.editor.language.json.converter.BpmnJsonConverter;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.impl.persistence.entity.ModelEntity;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.Model;
-import org.activiti.engine.repository.ProcessDefinition;
+import org.flowable.bpmn.converter.BpmnXMLConverter;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExclusiveGateway;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.Task;
+import org.flowable.editor.language.json.converter.BpmnJsonConverter;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.impl.persistence.entity.ModelEntity;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.Model;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -72,7 +72,7 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
     public void save(String modelId, String key, String name, String jsonXml, String svgXml, String description) {
         Model model = repositoryService.getModel(modelId);
         if(null == model){
-            throw new ActivitiException(String.format("模型编号【%s】不存在", modelId));
+            throw new FlowableException(String.format("模型编号【%s】不存在", modelId));
         }
 
         try{
@@ -84,7 +84,7 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
             repositoryService.addModelEditorSource(model.getId(), jsonXml.getBytes(StandardCharsets.UTF_8));
         }catch (Exception e){
             log.error("保存工作流失败：{}-->{}", e.getMessage(), e.getStackTrace());
-            throw new ActivitiException(e.getMessage());
+            throw new FlowableException(e.getMessage());
         }
 
     }
@@ -94,13 +94,13 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
         Model model = repositoryService.getModel(modelId);
         byte[] bytes = repositoryService.getModelEditorSource(model.getId());
         if (bytes == null) {
-            throw new ActivitiException("模型数据为空，请先设计流程并成功保存，再进行发布。");
+            throw new FlowableException("模型数据为空，请先设计流程并成功保存，再进行发布。");
         }
 
         try {
             BpmnModel bpmnModel = new BpmnJsonConverter().convertToBpmnModel(new ObjectMapper().readTree(bytes));
             if (bpmnModel.getProcesses().size() == 0) {
-                throw new ActivitiException("数据模型不符要求，请至少设计一条主线流程。");
+                throw new FlowableException("数据模型不符要求，请至少设计一条主线流程。");
             }
 
             byte[] bpmnBytes = new BpmnXMLConverter().convertToXML(bpmnModel);
@@ -119,7 +119,7 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
 
         } catch (IOException e) {
             log.error("流程发布失败：{}-->{}", e.getMessage(), e.getStackTrace());
-            throw new ActivitiException(e.getMessage());
+            throw new FlowableException(e.getMessage());
         }
 
     }
@@ -129,7 +129,7 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
     public void delete(String modelId) {
         Model model = repositoryService.getModel(modelId);
         if(null == model){
-            throw new ActivitiException(String.format("模型编号【%s】不存在", modelId));
+            throw new FlowableException(String.format("模型编号【%s】不存在", modelId));
         }
 
         if(null != model.getDeploymentId()){
@@ -151,7 +151,7 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
             // 更新模型
             ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey(workflowKey).latestVersion().singleResult();
             if(null == processDefinition){
-                throw new ActivitiException("模型文件上传失败，请检查文件是否正确");
+                throw new FlowableException("模型文件上传失败，请检查文件是否正确");
             }
 
             Model model = repositoryService.newModel();
@@ -169,7 +169,7 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
 
         } catch (Exception e) {
             log.error("【工作流模型】上传工作流模型文件失败：{}--{}", e.getMessage(), e.getStackTrace());
-            throw new ActivitiException(e.getMessage());
+            throw new FlowableException(e.getMessage());
         }
     }
 
@@ -197,7 +197,7 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
     public List<WorkflowModelNextTaskResponse> nextTasks(String workflowKey, String currentTask) {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey(workflowKey).singleResult();
         if(null == processDefinition){
-            throw new ActivitiException(String.format("工作流【%s】不存在", workflowKey));
+            throw new FlowableException(String.format("工作流【%s】不存在", workflowKey));
         }
 
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition.getId());
@@ -206,7 +206,7 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
         List<FlowElement> currentActivityFlowElementList = flowElementList.stream().filter(t -> t instanceof Task).filter(
                 t -> t.getId().equals(currentTask)).collect(Collectors.toList());
         if(CollectionUtils.isEmpty(currentActivityFlowElementList)){
-            throw new ActivitiException(String.format("任务节点【%s】不存在", currentTask));
+            throw new FlowableException(String.format("任务节点【%s】不存在", currentTask));
         }
 
         Task currentTaskFlowElement = (Task) currentActivityFlowElementList.get(0);
@@ -244,7 +244,7 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
     public WorkflowModel detail(String modelId) {
         ModelEntity modelEntity = (ModelEntity) repositoryService.getModel(modelId);
         if(null == modelEntity){
-            throw new ActivitiException(String.format("模型编号【%s】不存在", modelId));
+            throw new FlowableException(String.format("模型编号【%s】不存在", modelId));
         }
 
         WorkflowModel workflowModel = new WorkflowModel();
@@ -256,7 +256,7 @@ public class ActivitiModelServiceImpl implements ActivitiModelService {
                 workflowModel.setEditorSource((ObjectNode) objectMapper.readTree(new String(modelEditorSource, StandardCharsets.UTF_8)));
             } catch (JsonProcessingException e) {
                 log.error("查询模型失败：{}-->{}", e.getMessage(), e.getStackTrace());
-                throw new ActivitiException(String.format("查询模型失败【%s】", e.getMessage()));
+                throw new FlowableException(String.format("查询模型失败【%s】", e.getMessage()));
             }
         }
 

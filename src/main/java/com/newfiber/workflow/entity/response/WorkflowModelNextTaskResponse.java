@@ -5,9 +5,9 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.bpmn.model.Task;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.Task;
 
 @Data
 @AllArgsConstructor

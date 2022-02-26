@@ -6,7 +6,7 @@ import com.newfiber.workflow.entity.request.WorkflowModelPageRequest;
 import com.newfiber.workflow.entity.response.WorkflowModelNextTaskResponse;
 import com.newfiber.workflow.utils.PageWrapper;
 import java.util.List;
-import org.activiti.engine.repository.Model;
+import org.flowable.engine.repository.Model;
 import org.springframework.web.multipart.MultipartFile;
 
 /**

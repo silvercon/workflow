@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.newfiber.workflow.service.ActivitiEditorService;
 import java.io.InputStream;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.engine.ActivitiException;
+import org.flowable.engine.common.api.FlowableException;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -24,7 +24,7 @@ public class ActivitiEditorServiceImpl implements ActivitiEditorService {
             }
         } catch (Exception e) {
             log.error("加载BPMN按钮失败：{}-->{}", e.getMessage(), e.getStackTrace());
-            throw new ActivitiException(String.format("加载BPMN按钮失败【%s】", e.getMessage()));
+            throw new FlowableException(String.format("加载BPMN按钮失败【%s】", e.getMessage()));
         }
     }
 }

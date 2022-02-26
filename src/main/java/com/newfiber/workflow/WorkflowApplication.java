@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.spring.boot.SecurityAutoConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +14,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @RestController
 @EnableSwagger2
 @SpringBootApplication(scanBasePackages = {"com.newfiber.workflow", "com.newfiber.core.exception", "com.newfiber.config"},
-        exclude={SecurityAutoConfiguration.class})
+        exclude={org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
+	        org.flowable.spring.boot.SecurityAutoConfiguration.class})
 public class WorkflowApplication {
 
     public static void main(String[] args) {

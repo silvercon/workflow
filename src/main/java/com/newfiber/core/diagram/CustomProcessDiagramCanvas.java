@@ -19,11 +19,11 @@ import java.text.AttributedString;
 
 import javax.imageio.ImageIO;
 
-import org.activiti.bpmn.model.AssociationDirection;
-import org.activiti.bpmn.model.GraphicInfo;
-import org.activiti.image.exception.ActivitiImageException;
-import org.activiti.image.impl.DefaultProcessDiagramCanvas;
-import org.activiti.image.util.ReflectUtil;
+import org.flowable.bpmn.model.AssociationDirection;
+import org.flowable.bpmn.model.GraphicInfo;
+import org.flowable.image.exception.FlowableImageException;
+import org.flowable.image.impl.DefaultProcessDiagramCanvas;
+import org.flowable.image.util.ReflectUtil;
 
 /**
  * @author : X.K
@@ -165,7 +165,7 @@ public class CustomProcessDiagramCanvas extends DefaultProcessDiagramCanvas {
 	@Override
 	public BufferedImage generateBufferedImage(String imageType) {
 		if (closed) {
-			throw new ActivitiImageException("ProcessDiagramGenerator already closed");
+			throw new FlowableImageException("ProcessDiagramGenerator already closed");
 		}
 
 		// Try to remove white space
