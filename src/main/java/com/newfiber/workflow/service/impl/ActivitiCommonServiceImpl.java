@@ -7,12 +7,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.identity.User;
-import org.activiti.engine.task.IdentityLink;
-import org.activiti.engine.task.Task;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.TaskService;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.task.IdentityLink;
+import org.flowable.engine.task.Task;
+import org.flowable.idm.api.User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 

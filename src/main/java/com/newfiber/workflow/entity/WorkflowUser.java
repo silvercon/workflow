@@ -4,7 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
-import org.activiti.engine.identity.User;
+import org.flowable.idm.api.User;
 
 @Data
 public class WorkflowUser implements User {
@@ -39,10 +39,21 @@ public class WorkflowUser implements User {
     @ApiModelProperty(name = "password", value = "密码")
     private String password;
 
-    @Override
-    public boolean isPictureSet() {
-        return false;
-    }
+	/**
+	 * 显示名称
+	 */
+	@ApiModelProperty(name = "displayName", value = "显示名称")
+    private String displayName;
+
+	/**
+	 */
+	@ApiModelProperty(name = "tenantId", hidden = true)
+    private String tenantId;
+
+	/**
+	 */
+	@ApiModelProperty(name = "pictureSet", hidden = true)
+    private boolean pictureSet;
 
     public static List<WorkflowUser> build(List<User> userList){
         List<WorkflowUser> workflowUserList = new ArrayList<>();

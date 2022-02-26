@@ -5,8 +5,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.image.ProcessDiagramGenerator;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.image.ProcessDiagramGenerator;
 
 /**
  * @author : X.K

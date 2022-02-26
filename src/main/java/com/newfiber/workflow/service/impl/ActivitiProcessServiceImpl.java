@@ -30,31 +30,27 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.history.HistoricActivityInstance;
-import org.activiti.engine.history.HistoricActivityInstanceQuery;
-import org.activiti.engine.history.HistoricProcessInstance;
-import org.activiti.engine.history.HistoricTaskInstance;
-import org.activiti.engine.history.HistoricTaskInstanceQuery;
-import org.activiti.engine.identity.User;
-import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.activiti.engine.impl.util.IoUtil;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Comment;
-import org.activiti.engine.task.IdentityLink;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskInfo;
-import org.activiti.engine.task.TaskQuery;
-import org.activiti.image.ProcessDiagramGenerator;
+import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.IdentityService;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.util.IoUtil;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricActivityInstanceQuery;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.history.HistoricTaskInstanceQuery;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.task.Comment;
+import org.flowable.engine.task.IdentityLink;
+import org.flowable.engine.task.Task;
+import org.flowable.engine.task.TaskInfo;
+import org.flowable.engine.task.TaskQuery;
+import org.flowable.idm.api.User;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,9 +77,6 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
 
     @Resource
     private RepositoryService repositoryService;
-
-    @Resource
-    private ProcessEngine processEngine;
 
     @Override
     public String startWorkflow(IWorkflowCallback<?> callback, Object businessKey) {
@@ -141,13 +134,13 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
             String nextTaskApproveRoleId, List<String> notificationTemplateArgs) {
         User user = identityService.createUserQuery().userId(submitUser.toString()).singleResult();
         if(null == user){
-            throw new ActivitiException(String.format("用户【%s】不存在", submitUser.toString()));
+            throw new FlowableException(String.format("用户【%s】不存在", submitUser.toString()));
         }
 
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(
                 businessKey.toString(), callback.getWorkflowDefinition().getWorkflowKey()).singleResult();
         if(null == processInstance){
-            throw new ActivitiException(String.format("业务编号【%s】在工作流【%s】中不存在可执行实例",
+            throw new FlowableException(String.format("业务编号【%s】在工作流【%s】中不存在可执行实例",
                     businessKey.toString(), callback.getWorkflowDefinition().getWorkflowName()));
         }
 
@@ -155,7 +148,7 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
                 taskCandidateOrAssigned(submitUser.toString()).singleResult();
 
         if(null == task){
-            throw new ActivitiException(String.format("用户【%s】在工作流【%s】的业务编号【%s】中不存在可执行任务",
+            throw new FlowableException(String.format("用户【%s】在工作流【%s】的业务编号【%s】中不存在可执行任务",
                     user.getFirstName(), callback.getWorkflowDefinition().getWorkflowName(), businessKey.toString()));
         }
 
@@ -348,7 +341,7 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processDefinitionKey(workflowKey)
                 .processInstanceBusinessKey(businessKey.toString()).singleResult();
         if(null == historicProcessInstance){
-            throw new ActivitiException(String.format("业务编号【%s】不存在工作流【%s】", businessKey.toString(), workflowKey));
+            throw new FlowableException(String.format("业务编号【%s】不存在工作流【%s】", businessKey.toString(), workflowKey));
         }
 
         HistoricActivityInstanceQuery historicActivityInstanceQuery = historyService.createHistoricActivityInstanceQuery()
