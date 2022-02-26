@@ -70,7 +70,7 @@ public interface ActivitiProcessService {
      * @return 业务编号
      */
     String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, Object submitUser, String approveResult,
-	    String approveComment, String nextTaskApproveUserId, List<String> nextTaskApproveUserIdList,
+	    String approveComment, String nextTaskApproveUserId, List<String> nextTaskApproveUserIdList,Boolean signCompletionCondition,
 	    String nextTaskApproveRoleId, List<String> notificationTemplateArgs);
 
     // ************************* 消息通知 ************************* //

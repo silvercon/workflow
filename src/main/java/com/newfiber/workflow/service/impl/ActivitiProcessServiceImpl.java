@@ -130,14 +130,14 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
     @Override
     public String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, WorkflowSubmitReq submitReq) {
         return submitWorkflow(callback, businessKey, submitReq.getSubmitUserId(), submitReq.getApproveResult(),
-	        submitReq.getApproveComment(), submitReq.getNextTaskApproveUserId(),
-	        submitReq.getNextTaskApproveUserIdList(), submitReq.getNextTaskApproveRoleId(), submitReq.getNotificationTemplateArgs());
+	        submitReq.getApproveComment(), submitReq.getNextTaskApproveUserId(),submitReq.getNextTaskApproveUserIdList(),
+                submitReq.getSignCompletionCondition(), submitReq.getNextTaskApproveRoleId(), submitReq.getNotificationTemplateArgs());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, Object submitUser, String approveResult,
-	        String approveComment, String nextTaskApproveUserId, List<String> nextTaskApproveUserIdList,
+	        String approveComment, String nextTaskApproveUserId, List<String> nextTaskApproveUserIdList,Boolean signCompletionCondition,
             String nextTaskApproveRoleId, List<String> notificationTemplateArgs) {
         User user = identityService.createUserQuery().userId(submitUser.toString()).singleResult();
         if(null == user){
@@ -174,6 +174,9 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
         }
         if(!CollectionUtils.isEmpty(nextTaskApproveUserIdList)){
             transientVariables.put(EConstantValue.ApproveUserIdListField.getValue(), nextTaskApproveUserIdList);
+        }
+        if(signCompletionCondition != null){
+            transientVariables.put(EConstantValue.SignCompletionCondition.getValue(), signCompletionCondition);
         }
         if(StringUtils.isNotBlank(nextTaskApproveRoleId)){
             transientVariables.put(EConstantValue.ApproveRoleIdField.getValue(), nextTaskApproveRoleId);

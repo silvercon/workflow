@@ -16,6 +16,8 @@ public enum EConstantValue {
 
     EndEvent("结束事件", "end"),
 
+    SignCompletionCondition("会签完成条件", "signCompletionCondition"),
+
     IWorkflowCallback("工作流回调接口", "IWorkflowCallback"),
 
     EmailNotificationSubject("邮件消息通知主题", "提醒：您有新的待办任务"),
