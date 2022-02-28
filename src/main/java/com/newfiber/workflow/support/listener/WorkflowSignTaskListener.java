@@ -1,16 +1,16 @@
 package com.newfiber.workflow.support.listener;
 
 import com.newfiber.workflow.enums.EConstantValue;
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngines;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.delegate.DelegateTask;
-import org.flowable.engine.delegate.TaskListener;
+import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.ProcessEngines;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.delegate.DelegateTask;
+import org.activiti.engine.delegate.TaskListener;
 
 /**
- * 计数签任务监听器
+ * 会签任务监听器
  */
-public class WorkflowCounterSignTaskListener implements TaskListener {
+public class WorkflowSignTaskListener implements TaskListener {
 
     private static final long serialVersionUID = 1L;
 
