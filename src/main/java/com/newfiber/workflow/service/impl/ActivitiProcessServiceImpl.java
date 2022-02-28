@@ -124,13 +124,13 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
     public String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, WorkflowSubmitReq submitReq) {
         return submitWorkflow(callback, businessKey, submitReq.getSubmitUserId(), submitReq.getApproveResult(),
 	        submitReq.getApproveComment(), submitReq.getNextTaskApproveUserId(),submitReq.getNextTaskApproveUserIdList(),
-                submitReq.getSignCompletionCondition(), submitReq.getNextTaskApproveRoleId(), submitReq.getNotificationTemplateArgs());
+                submitReq.getNextTaskApproveRoleId(), submitReq.getNotificationTemplateArgs());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String submitWorkflow(IWorkflowCallback<?> callback, Object businessKey, Object submitUser, String approveResult,
-	        String approveComment, String nextTaskApproveUserId, List<String> nextTaskApproveUserIdList,Boolean signCompletionCondition,
+	        String approveComment, String nextTaskApproveUserId, List<String> nextTaskApproveUserIdList,
             String nextTaskApproveRoleId, List<String> notificationTemplateArgs) {
         User user = identityService.createUserQuery().userId(submitUser.toString()).singleResult();
         if(null == user){
@@ -152,24 +152,16 @@ public class ActivitiProcessServiceImpl implements ActivitiProcessService {
                     user.getFirstName(), callback.getWorkflowDefinition().getWorkflowName(), businessKey.toString()));
         }
 
-//        Set<String> taskUserList = listTaskUser(task);
-//        if(null != taskUserList && !taskUserList.contains(submitUser.toString())){
-//            throw new ActivitiException(String.format("提交失败，用户【%s(%s)】不存在审核权限", user.getFirstName(), user.getId()));
-//        }
-
         Map<String, Object> variables = new HashMap<>(1);
         variables.put(EConstantValue.ApproveResultField.getValue(), approveResult);
 
         // 任务本地变量
-        Map<String, Object> transientVariables = new HashMap<>(2);
+        Map<String, Object> transientVariables = new HashMap<>();
         if(StringUtils.isNotBlank(nextTaskApproveUserId)){
             transientVariables.put(EConstantValue.ApproveUserIdField.getValue(), nextTaskApproveUserId);
         }
         if(!CollectionUtils.isEmpty(nextTaskApproveUserIdList)){
             transientVariables.put(EConstantValue.ApproveUserIdListField.getValue(), nextTaskApproveUserIdList);
-        }
-        if(signCompletionCondition != null){
-            transientVariables.put(EConstantValue.SignCompletionCondition.getValue(), signCompletionCondition);
         }
         if(StringUtils.isNotBlank(nextTaskApproveRoleId)){
             transientVariables.put(EConstantValue.ApproveRoleIdField.getValue(), nextTaskApproveRoleId);

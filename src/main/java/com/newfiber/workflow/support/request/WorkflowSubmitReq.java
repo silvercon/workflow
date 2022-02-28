@@ -46,12 +46,6 @@ public class WorkflowSubmitReq{
     private String nextTaskApproveUserId;
 
     /**
-     * 会签完成条件
-     */
-    @ApiModelProperty(name = "signCompletionCondition", value = "会签完成条件")
-    private Boolean signCompletionCondition;
-
-    /**
      * 下一步任务会签审核人（会签）
      */
     @ApiModelProperty(name = "nextTaskApproveUserIdList", value = "下一步任务会签审核人")
