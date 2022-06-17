@@ -4,6 +4,7 @@ package com.newfiber.core.diagram;
 
 import org.flowable.bpmn.model.*;
 import org.flowable.bpmn.model.Process;
+import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -25,8 +26,7 @@ import java.util.Set;
  * @since : 2022/2/24 下午1:26
  */
 @Component
-public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerator implements
-	ICustomProcessDiagramGenerator {
+public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
 	//预初始化流程图绘制，大大提升了系统启动后首次查看流程图的速度
 	static {
 		new CustomProcessDiagramCanvas(10,10,0,0,"png", "宋体","宋体","宋体",null);
@@ -340,7 +340,6 @@ public class CustomProcessDiagramGenerator extends DefaultProcessDiagramGenerato
 			imageType, activityFontName, labelFontName, annotationFontName, customClassLoader);
 	}
 
-	@Override
 	public InputStream generateDiagram(BpmnModel bpmnModel, String imageType, List<String> highLightedActivities,
 		List<String> highLightedFlows, String activityFontName, String labelFontName, String annotationFontName,
 		ClassLoader customClassLoader, double scaleFactor, Color[] colors, Set<String> currIds) {

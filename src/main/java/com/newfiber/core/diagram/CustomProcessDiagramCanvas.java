@@ -2,6 +2,7 @@ package com.newfiber.core.diagram;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
@@ -14,9 +15,11 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
 
+import java.util.Objects;
 import javax.imageio.ImageIO;
 
 import org.flowable.bpmn.model.AssociationDirection;
@@ -37,6 +40,13 @@ public class CustomProcessDiagramCanvas extends DefaultProcessDiagramCanvas {
 	protected String activityFontName = "宋体";
 	protected String labelFontName = "宋体";
 	protected String annotationFontName = "宋体";
+	protected Font font = null;
+	{
+		try {
+			InputStream inputStream = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResourceAsStream("font/SIMSUN.TTC"));
+			font = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+		} catch (Exception ignore) {}
+	}
 
 	private static volatile boolean flag = false;
 
@@ -126,13 +136,13 @@ public class CustomProcessDiagramCanvas extends DefaultProcessDiagramCanvas {
 		// text
 		if (text != null && text.length() > 0) {
 			Paint originalPaint = g.getPaint();
-			Font originalFont = g.getFont();
+			Font originalFont = this.g.getFont();
 			if (highLighted) {
 				g.setPaint(ActivitiWorkflowConstants.COLOR_NORMAL);
 			} else {
 				g.setPaint(LABEL_COLOR);
 			}
-			g.setFont(new Font(labelFontName, Font.BOLD, 10));
+			this.g.setFont(this.font);
 
 			int wrapWidth = 100;
 			int textY = (int) graphicInfo.getY();
@@ -157,7 +167,7 @@ public class CustomProcessDiagramCanvas extends DefaultProcessDiagramCanvas {
 			}
 
 			// restore originals
-			g.setFont(originalFont);
+			this.g.setFont(originalFont);
 			g.setPaint(originalPaint);
 		}
 	}
@@ -190,12 +200,15 @@ public class CustomProcessDiagramCanvas extends DefaultProcessDiagramCanvas {
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g.setPaint(Color.black);
 
-		Font font = new Font(activityFontName, Font.BOLD, FONT_SIZE);
-		g.setFont(font);
+		Font font = this.font;
+		if(null == font){
+			font = new Font(activityFontName, Font.BOLD, FONT_SIZE);
+		}
+		this.g.setFont(font);
 		this.fontMetrics = g.getFontMetrics();
 
-		LABEL_FONT = new Font(labelFontName, Font.ITALIC, 10);
-		ANNOTATION_FONT = new Font(annotationFontName, Font.PLAIN, FONT_SIZE);
+		LABEL_FONT = this.font;
+		ANNOTATION_FONT = this.font;
 		//优化加载速度
 		if(flag) {
 			return;

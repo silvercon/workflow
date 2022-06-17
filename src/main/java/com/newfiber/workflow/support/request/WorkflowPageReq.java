@@ -29,7 +29,7 @@ public class WorkflowPageReq extends BasePageReq{
     private String workflowUserId;
 
 	/**
-	 * 查询范围（代办 todo / 已办 done / 全部 all，默认all）
+	 * 查询范围
 	 */
 	@ApiModelProperty(name = "queryScope", value = "查询范围（代办 todo / 已办 done / 全部 all，默认all）")
 	private String queryScope = "all";

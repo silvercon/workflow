@@ -6,7 +6,7 @@ package com.newfiber.workflow.enums;
 public enum EQueryScope {
 
     /**
-     * 查询范围（代办 todo / 已办 done / 全部 all）
+     * 查询范围
      */
     Todo("todo", "代办"),
 	Done("done", "已办"),
